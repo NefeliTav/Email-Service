@@ -1,10 +1,15 @@
+from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from validate_email import validate_email
 from django.contrib.auth.hashers import make_password
-import datetime
-import re
 from .models import Account
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse
+import requests
+import datetime
+import json
+import re
 
 
 def valid_phone(phone):
@@ -46,53 +51,105 @@ def to_days(then):
 
 
 def login(request):
-    return render(request, "accounts/login.html", {})
+    if request.method == "POST":
+        data = request.read()
+
+        # get data from frontend and convert it to json
+        data = data.decode('utf8').replace("'", '"')
+        data = json.loads(data)
+        data = json.dumps(data, indent=4, sort_keys=True)
+        data = json.loads(data)
+
+        email = data["email"]
+        password = data["password"]
+
+        # check if data is valid
+        try:
+            obj = Account.objects.get(email=email+'@email.com')
+            if not obj:
+                message = {"message": "Wrong email address."}
+                # return render(request, "accounts/login.html", message)
+                # try again
+                return redirect('/login')
+        except:
+            pass
+
+        # start session
+        request.session['email'] = email
+        # valid data -> go to home page
+        # return render(request, "accounts/homepage.html", {"email":email})
+
+    else:
+        return render(request, "accounts/login.html", {})
 
 
 def signup(request):
-    if request.method == 'POST':
 
-        # get data from frontend
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        email = request.POST['email']
-        phone = request.POST['tel']
-        date_of_birth = request.POST['date']
-        password = request.POST['psw']
-        confirm = request.POST['psw2']
+    if request.method == "POST":
+        data = request.read()
+
+        # get data from frontend and convert it to json
+        data = data.decode('utf8').replace("'", '"')
+        data = json.loads(data)
+        data = json.dumps(data, indent=4, sort_keys=True)
+        data = json.loads(data)
+
+        first_name = data["first_name"]
+        last_name = data["last_name"]
+        email = data["email"]
+        phone = data["phone"]
+        date_of_birth = data["date_of_birth"]
+        password = data["password"]
+        confirm = data["confirm"]
 
         # check if data is valid
         try:
             obj = Account.objects.get(email=email+'@email.com')
             if obj:
                 message = {"message": "This email address already exists"}
-                return render(request, "accounts/signup.html", message)
+                # return render(request, "accounts/signup.html", message)
+                # try again
+                return redirect('/signup')
         except:
             pass
+
         if not first_name.replace(" ", "").isalpha():
             message = {"message": "Invalid name"}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
+
         if not last_name.replace(" ", "").isalpha():
             message = {"message": "Invalid surname"}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
+
         valid_email = validate_email(email + '@email.com')
         if not valid_email:
             message = {"message": "Invalid email address"}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
+
         if not valid_phone(phone):
             message = {"message": "Invalid phone number"}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
+
         if not valid_password(password):
             # not pretty
             message = {
                 "message": "Invalid password.Requirements:Minimum 8 characters.The letters must be between [a-z].At least one letter should be of Upper Case [A-Z].At least 1 number or digit between [0-9].At least 1 character from [ _ or @ or $ ]."}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
+
         if password != confirm:
             message = {"message": "Passwords are not matching"}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
+
         if to_days(date_of_birth) < 4745:  # (365*13), the user is a child
             message = {"message": "You are too young to have an email account!"}
-            return render(request, "accounts/signup.html", message)
+            # try again
+            return redirect('/signup')
 
         # valid data -> create user
         try:
@@ -101,11 +158,12 @@ def signup(request):
             user.save()
             # user is in db
             print('User Created')
-            message = {"message": "success"}
+            # go to home page
         except:
+
             # if any problem occurs, try again
             return redirect('/signup')
-        return render(request, "accounts/signup.html", message)
+
     else:
         return render(request, "accounts/signup.html", {})
 
@@ -115,21 +173,35 @@ def profile(request):
 
 
 def get_accounts(request):
-    MAX_OBJECTS = 20
-    accounts = Account.objects.all()[:MAX_OBJECTS]
-    data = {"results": list(accounts.values(
-        "first_name", "last_name", "email", "phone", "date_of_birth", "password"))}
-    return JsonResponse(data)
+    accounts = list(Account.objects.values())
+    return JsonResponse(accounts, safe=False)
 
 
 def get_account(request, pk):
     account = get_object_or_404(Account, pk=pk)
-    data = {"results": {
-        "first_name": account.first_name,
-        "last_name": account.last_name,
-        "email": account.email,
-        "phone": account.phone,
-        "date_of_birth": account.date_of_birth,
-        "password": account.password
-    }}
+    data = {"id": account.id,
+            "first_name": account.first_name,
+            "last_name": account.last_name,
+            "email": account.email,
+            "phone": account.phone,
+            "date_of_birth": account.date_of_birth,
+            "password": account.password
+            }
     return JsonResponse(data)
+
+
+def delete_account(request, pk):
+    try:
+        account = Account.objects.get(pk=pk)
+        account.delete()
+        return JsonResponse({"deleted": True}, safe=False)
+    except:
+        return JsonResponse({"error": "not a valid primary key"}, safe=False)
+
+
+def logout(request):
+    try:
+        del request.session['email']
+    except:
+        pass
+    return HttpResponse("<strong>You are logged out.</strong>")

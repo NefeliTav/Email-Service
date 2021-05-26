@@ -1,8 +1,41 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 <h1>Login</h1>
-<form action="" method="post">
-	<input type="text" placeholder="Enter Username" name="uname" required />
-	<input type="password" placeholder="Enter Password" name="psw" required />
-	<button type="submit">Login</button>
+<form>
+	<!--action="" method="POST"-->
+	{% csrf_token %}
+	<script>
+		const login = () => {
+			axios.defaults.xsrfCookieName = 'csrftoken';
+			axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+			axios.post("/auth/login/",
+				{
+					'email':document.getElementById("email").value,
+					'password':document.getElementById("password").value
+				}
+			).then((res)=>console.log(res))
+			.catch((e)=>console.error(e));
+		}
+	</script>
+
+	<!-- permanent placeholder-->
+	<input type="text" 
+	id="email"
+	placeholder="@email.com" 
+	name="email" 
+	required /><br/>
+
+	<input type="password"
+		id="password"
+		placeholder="Enter Password"
+		name="psw"
+		required
+	/><br/>
+
+	<button type="submit" onclick="login()">Login</button>
 </form>
+{% if message%}
+<p>{{message}}</p>
+{% endif %} 
+
 {% endblock %}

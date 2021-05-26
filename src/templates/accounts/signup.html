@@ -1,43 +1,74 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 <h1>Sign up</h1>
-<form action="" method="POST">
+<form>
+	<!--action="" method="POST"-->
 	{% csrf_token %}
+	<script>
+		const signup = () => {
+			axios.defaults.xsrfCookieName = 'csrftoken';
+			axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+			axios.post("/auth/signup/",
+				{
+					'first_name': document.getElementById("firstname").value,
+					'last_name':document.getElementById("lastname").value,
+					'email':document.getElementById("email").value,
+					'phone':document.getElementById("phone").value,
+					'date_of_birth':document.getElementById("date_of_birth").value,
+					'password':document.getElementById("password").value,
+					'confirm':document.getElementById("confirm").value
+				}
+			).then((res)=>console.log(res))
+			.catch((e)=>console.error(e));
+		}
+	</script>
 	<input
 		type="text"
+		id="firstname"
 		placeholder="Enter First Name"
 		name="first_name"
 		required
 	/><br />
 	<input
 		type="text"
+		id="lastname"
 		placeholder="Enter Last Name"
 		name="last_name"
 		required
 	/><br />
 	<!-- permanent placeholder-->
-	<input type="text" placeholder="@email.com" name="email" required /><br />
-	<input type="text" placeholder="Enter Phone" name="tel" required /><br />
+	<input type="text" 
+	id="email"
+	placeholder="@email.com" name="email" required /><br />
+	<input type="text" 
+	id="phone"
+	placeholder="Enter Phone" name="tel" required /><br />
 	<input
 		type="date"
+		id="date_of_birth"
 		placeholder="Enter Date of Birth"
 		name="date"
 		required
 	/><br />
 	<input
 		type="password"
+		id="password"
 		placeholder="Enter Password"
 		name="psw"
 		required
 	/><br />
 	<input
 		type="password"
+		id="confirm"
 		placeholder="Confirm Password"
 		name="psw2"
 		required
 	/><br />
 
-	<button type="submit">Sign up</button>
+	<button type="submit" onclick="signup()">Sign up</button>
 </form>
 {% if message%}
 <p>{{message}}</p>
-{% endif %} {% endblock %}
+{% endif %} 
+
+{% endblock %}

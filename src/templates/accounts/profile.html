@@ -1,4 +1,50 @@
 {% extends 'base.html' %} {% block content %}
 <h1>Profile Dashboard</h1>
-<form action="" method="post"></form>
+<form>
+    {% csrf_token %}
+    <input
+		type="text"
+		id="firstname"
+		placeholder="Enter First Name"
+		name="first_name"
+		required
+	/><br />
+	<input
+		type="text"
+		id="lastname"
+		placeholder="Enter Last Name"
+		name="last_name"
+		required
+	/><br />
+	<!-- permanent placeholder-->
+	<input type="text" 
+	id="email"
+	placeholder="@email.com" name="email" required /><br />
+	<input type="text" 
+	id="phone"
+	placeholder="Enter Phone" name="tel" required /><br />
+	<input
+		type="date"
+		id="date_of_birth"
+		placeholder="Enter Date of Birth"
+		name="date"
+		required
+	/><br />
+	<input
+		type="password"
+		id="password"
+		placeholder="Enter Password"
+		name="psw"
+		required
+	/><br />
+	<input
+		type="password"
+		id="confirm"
+		placeholder="Confirm Password"
+		name="psw2"
+		required
+	/><br />
+
+	<button type="submit">Update</button>
+</form>
 {% endblock %}
