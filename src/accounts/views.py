@@ -10,6 +10,8 @@ import requests
 import datetime
 import json
 import re
+from django.contrib import messages
+from rest_framework.exceptions import NotFound
 
 
 def valid_phone(phone):
@@ -86,13 +88,9 @@ def login(request):
 def signup(request):
 
     if request.method == "POST":
-        data = request.read()
 
-        # get data from frontend and convert it to json
-        data = data.decode('utf8').replace("'", '"')
-        data = json.loads(data)
-        data = json.dumps(data, indent=4, sort_keys=True)
-        data = json.loads(data)
+        # read data from client
+        data = json.loads(request.body)
 
         first_name = data["first_name"]
         last_name = data["last_name"]
@@ -103,53 +101,38 @@ def signup(request):
         confirm = data["confirm"]
 
         # check if data is valid
+        errors = {}
         try:
             obj = Account.objects.get(email=email+'@email.com')
             if obj:
-                message = {"message": "This email address already exists"}
-                # return render(request, "accounts/signup.html", message)
-                # try again
-                return redirect('/signup')
+                errors["email"] = "This email address already exists"
         except:
             pass
 
         if not first_name.replace(" ", "").isalpha():
-            message = {"message": "Invalid name"}
-            # try again
-            return redirect('/signup')
+            errors["firstname"] = "Invalid first name"
 
         if not last_name.replace(" ", "").isalpha():
-            message = {"message": "Invalid surname"}
-            # try again
-            return redirect('/signup')
+            errors["lastname"] = "Invalid last name"
 
-        valid_email = validate_email(email + '@email.com')
-        if not valid_email:
-            message = {"message": "Invalid email address"}
-            # try again
-            return redirect('/signup')
+        if not validate_email(email + '@email.com'):
+            errors["email2"] = "Invalid email address"
 
         if not valid_phone(phone):
-            message = {"message": "Invalid phone number"}
-            # try again
-            return redirect('/signup')
+            errors["phone"] = "Invalid phone number"
 
         if not valid_password(password):
             # not pretty
-            message = {
-                "message": "Invalid password.Requirements:Minimum 8 characters.The letters must be between [a-z].At least one letter should be of Upper Case [A-Z].At least 1 number or digit between [0-9].At least 1 character from [ _ or @ or $ ]."}
-            # try again
-            return redirect('/signup')
+            errors["password"] = "Invalid password.Requirements:Minimum 8 characters.The letters must be between [a-z].At least one letter should be of Upper Case [A-Z].At least 1 number or digit between [0-9].At least 1 character from [ _ or @ or $ ]."
 
         if password != confirm:
-            message = {"message": "Passwords are not matching"}
-            # try again
-            return redirect('/signup')
+            errors["confirm"] = "Passwords are not matching"
 
         if to_days(date_of_birth) < 4745:  # (365*13), the user is a child
-            message = {"message": "You are too young to have an email account!"}
-            # try again
-            return redirect('/signup')
+            errors["date_of_birth"] = "You are too young to have an email account!"
+
+        if errors != {}:
+            return JsonResponse({'errors': errors})
 
         # valid data -> create user
         try:
@@ -159,10 +142,11 @@ def signup(request):
             # user is in db
             print('User Created')
             # go to home page
+            return HttpResponseRedirect('/auth/login/')
+            # return redirect('../../home')
         except:
-
             # if any problem occurs, try again
-            return redirect('/signup')
+            return render(request, "accounts/signup.html", {})
 
     else:
         return render(request, "accounts/signup.html", {})
