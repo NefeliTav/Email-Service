@@ -2,7 +2,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from validate_email import validate_email
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .models import Account
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -52,39 +52,41 @@ def to_days(then):
     return int(diff[0])
 
 
+@csrf_exempt
 def login(request):
     if request.method == "POST":
-        data = request.read()
-
-        # get data from frontend and convert it to json
-        data = data.decode('utf8').replace("'", '"')
-        data = json.loads(data)
-        data = json.dumps(data, indent=4, sort_keys=True)
-        data = json.loads(data)
+        # read data from client
+        data = json.loads(request.body)
 
         email = data["email"]
         password = data["password"]
 
-        # check if data is valid
+        # authenticate
+        errors = {}
         try:
             obj = Account.objects.get(email=email+'@email.com')
-            if not obj:
-                message = {"message": "Wrong email address."}
-                # return render(request, "accounts/login.html", message)
-                # try again
-                return redirect('/login')
+            if not check_password(password, obj.password):
+                errors["password"] = "Wrong password"
         except:
-            pass
+            errors["email"] = "This email address doesn't exist"
 
+        # return error messages
+        if errors != {}:
+            return JsonResponse({'errors': errors})
+
+        print("Login successful")
         # start session
         request.session['email'] = email
         # valid data -> go to home page
+        return redirect("homepage")
+
         # return render(request, "accounts/homepage.html", {"email":email})
 
     else:
         return render(request, "accounts/login.html", {})
 
 
+@csrf_exempt
 def signup(request):
 
     if request.method == "POST":
@@ -142,7 +144,7 @@ def signup(request):
             # user is in db
             print('User Created')
             # go to home page
-            return HttpResponseRedirect('/auth/login/')
+            return redirect("homepage")
             # return redirect('../../home')
         except:
             # if any problem occurs, try again

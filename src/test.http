@@ -5,7 +5,7 @@ Content-Type: application/json
 
 ### Get account with id = 2
 
-GET http://127.0.0.1:8000/accounts/2 HTTP/1.1\r\n
+GET http://127.0.0.1:8000/accounts/27 HTTP/1.1\r\n
 Content-Type: application/json
 
 
@@ -17,21 +17,21 @@ Content-Type: application/json
 {
     "first_name": "Nikos",
     "last_name": "Papadopoulos",
-    "email": "email@email.com",
+    "email": "email3",
     "phone": "6934782937",
     "date_of_birth": "2000-12-12",
-    "password": "X91m0n0s@",
-    "confirm": "X91m0n0s@"
+    "password": "F31l0f0s@",
+    "confirm": "F31l0f0s@"
 }
 
 
 ### Login
 
-POST http://127.0.0.1:8000/login/ HTTP/1.1\r\n
+POST http://127.0.0.1:8000/auth/login/ HTTP/1.1\r\n
 Content-Type: application/json
 
 {
-    "email": "matt@justdjango.com",
-    "password": "pbkdf2_sha256$260000$y6y6nfmyekKNUpsjrmWLfE$TjlcrFL7iXcfdzVJpr5BOS//EoAepleSYNQ5Ghx4N78="
+    "email": "email3",
+    "password": "F31l0f0s@"
 }
 
