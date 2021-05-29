@@ -21,7 +21,7 @@ from accounts.views import get_accounts, get_account, delete_account, profile
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('accounts.urls')),
-    path('home/', views.home_view, name="homepage"),
+    path('home/', views.home_view),
     path('accounts/', get_accounts),
     path('accounts/<int:pk>/', get_account),
     path('accounts/delete/<int:pk>/', delete_account),

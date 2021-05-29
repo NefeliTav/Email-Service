@@ -1,4 +1,3 @@
-from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from validate_email import validate_email
@@ -6,18 +5,9 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import Account
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
-import requests
 import datetime
 import json
 import re
-from django.contrib import messages
-from rest_framework.exceptions import NotFound
-
-
-def valid_phone(phone):
-    expression = re.compile(
-        "^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$")
-    return expression.match(phone)
 
 
 def valid_password(psw):
@@ -78,10 +68,7 @@ def login(request):
         # start session
         request.session['email'] = email
         # valid data -> go to home page
-        return redirect("homepage")
-
-        # return render(request, "accounts/homepage.html", {"email":email})
-
+        return JsonResponse(data)
     else:
         return render(request, "accounts/login.html", {})
 
@@ -97,7 +84,6 @@ def signup(request):
         first_name = data["first_name"]
         last_name = data["last_name"]
         email = data["email"]
-        phone = data["phone"]
         date_of_birth = data["date_of_birth"]
         password = data["password"]
         confirm = data["confirm"]
@@ -120,9 +106,6 @@ def signup(request):
         if not validate_email(email + '@email.com'):
             errors["email2"] = "Invalid email address"
 
-        if not valid_phone(phone):
-            errors["phone"] = "Invalid phone number"
-
         if not valid_password(password):
             # not pretty
             errors["password"] = "Invalid password.Requirements:Minimum 8 characters.The letters must be between [a-z].At least one letter should be of Upper Case [A-Z].At least 1 number or digit between [0-9].At least 1 character from [ _ or @ or $ ]."
@@ -139,13 +122,13 @@ def signup(request):
         # valid data -> create user
         try:
             user = Account.objects.create(first_name=first_name, last_name=last_name, email=email+'@email.com',
-                                          phone=phone, date_of_birth=date_of_birth, password=make_password(password))  # hash password
+                                          date_of_birth=date_of_birth, password=make_password(password))  # hash password
             user.save()
+
             # user is in db
             print('User Created')
             # go to home page
-            return redirect("homepage")
-            # return redirect('../../home')
+            return JsonResponse(data)
         except:
             # if any problem occurs, try again
             return render(request, "accounts/signup.html", {})

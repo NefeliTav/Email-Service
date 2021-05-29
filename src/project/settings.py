@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
+import boto3
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -80,6 +81,7 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -126,7 +128,24 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+'''
+#DB_ENDPOINT = 'http://localhost:8000/auth/signup'
+#DB_TABLE = 'Account'
+session = boto3.session.Session(
+    aws_access_key_id=None,
+    aws_secret_access_key=None,
+    aws_session_token=None,
+    region_name=None
+)
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table("Account")
+'''

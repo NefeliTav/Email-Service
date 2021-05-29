@@ -5,7 +5,7 @@ Content-Type: application/json
 
 ### Get account with id = 2
 
-GET http://127.0.0.1:8000/accounts/27 HTTP/1.1\r\n
+GET http://127.0.0.1:8000/accounts/1 HTTP/1.1\r\n
 Content-Type: application/json
 
 
@@ -17,7 +17,7 @@ Content-Type: application/json
 {
     "first_name": "Nikos",
     "last_name": "Papadopoulos",
-    "email": "email3",
+    "email": "email",
     "phone": "6934782937",
     "date_of_birth": "2000-12-12",
     "password": "F31l0f0s@",
@@ -31,7 +31,7 @@ POST http://127.0.0.1:8000/auth/login/ HTTP/1.1\r\n
 Content-Type: application/json
 
 {
-    "email": "email3",
+    "email": "email",
     "password": "F31l0f0s@"
 }
 
