@@ -1,50 +1,148 @@
-{% extends 'base.html' %} {% block content %}
-<h1>Profile Dashboard</h1>
-<form>
-    {% csrf_token %}
-    <input
-		type="text"
-		id="firstname"
-		placeholder="Enter First Name"
-		name="first_name"
-		readonly
-	/><br />
-	<input
-		type="text"
-		id="lastname"
-		placeholder="Enter Last Name"
-		name="last_name"
-		readonly
-	/><br />
-	<!-- permanent placeholder-->
-	<input type="text" 
-	id="email"
-	placeholder="@email.com" name="email" readonly /><br />
-	<input type="text" 
-	id="phone"
-	placeholder="Enter Phone" name="tel"/><br />
-	<input
-		type="date"
-		id="date_of_birth"
-		placeholder="Enter Date of Birth"
-		name="date"
-		readonly
-	/><br />
-	<input
-		type="password"
-		id="password"
-		placeholder="Enter Password"
-		name="psw"
-		
-	/><br />
-	<input
-		type="password"
-		id="confirm"
-		placeholder="Confirm Password"
-		name="psw2"
-	
-	/><br />
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
-	<button type="submit">Update</button>
+<link rel="stylesheet" type='text/css' href="{% static 'css/login.css' %}">
+  <div class="bg">
+	<div class="columns ">
+	  <div class="login-box">
+		<form action="" onsubmit="profile(); return false;">
+			{% csrf_token %}
+
+			<script>
+				const profile = () => {
+					document.getElementById("password-error").style.display = 'none';
+					document.getElementById("confirm-error").style.display = 'none';
+
+					axios.defaults.xsrfCookieName = 'csrftoken';
+					axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+					axios.patch("/profile/",JSON.stringify(
+						{
+							'password':document.getElementById("password").value,
+							'confirm':document.getElementById("confirm").value
+						})
+					).then((res)=>{
+						if (res.data.errors) {
+							const errors = res.data.errors
+							Object.keys(errors).forEach((key) => {
+								console.log(key, errors[key]);
+								document.getElementById(key + "-error").style.display = "block";
+								const message = document.getElementById(key + "-error");
+								message.innerHTML =  errors[key];
+							});
+						}
+						else {
+							window.location.replace("../");
+						}
+					})
+					.catch((e)=>console.error(e));
+				}
+
+				//show password
+				function show_password(id1, id2) {
+					var x = document.getElementById(id1);
+
+					if (x.type === "password") {
+						x.type = "text";
+					} else {
+						x.type = "password";
+					}
+
+					if (id2 !== undefined) {
+						var y = document.getElementById(id2);
+						if (y.type === "password") {
+							y.type = "text";
+						} else {
+							y.type = "password";
+						}
+					}
+				}
+
+			</script>
+	
+		<div class="signin" [hidden]="Profile">
+		<h1 class="topline">Profile Dashboard</h1>
+		<br/>
+	
+		<div class="input-field">
+			<input 
+				type="text"
+				id="firstname"
+				value="{{ first_name }}"
+				name="first_name"
+				required
+				readonly/>
+		  </div>
+
+		  <div class="input-field">
+			<input 
+				type="text"
+				id="lastname"
+				value="{{ last_name }}"
+				name="last_name"
+				required
+				readonly/>
+		  </div>
+		  <div class="input-field">
+			<input 
+				type="text" 
+				id="email"
+				value="{{ email }}@email.com"
+				name="email" 
+				required
+				readonly/>
+		  </div>
+		  <div class="input-field">
+			<input 
+				type="date" 
+				id="date_of_birth"
+				value="{{ date_of_birth }}"
+				name="date" 
+				required
+				readonly/>
+		  </div>
+		  <div class="input-field">
+			<input 
+				type="text" 
+				id="password_old"
+				value="{{ password  }}"
+				name="psw" 
+				required
+				readonly/>
+		  </div>
+
+
+
+		  <div class="input-field">
+			<input 
+				type="password" 
+				id="password"
+				placeholder="Change your Password" 
+				name="psw" 
+				required/>
+		  </div>
+		  <div id="password-error" class="error"></div>
+
+		  <div class="input-field">
+			<input 
+				type="password" 
+				id="confirm"
+				placeholder="Confirm your new Password" 
+				name="psw2" 
+				required/>
+		  </div>
+		  <div id="confirm-error" class="error"></div>
+		  <div>
+			<input type="checkbox" onclick="show_password('password','confirm')">Show Password
+		</div>
+
+		<div class="login-box-button">
+		<button type="submit">
+		  <i class="fas fa-sign-in-alt"></i>
+		  UPDATE
+		</button>
+	  </div>
 </form>
+
+
 {% endblock %}

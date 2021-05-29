@@ -3,7 +3,6 @@
 {% block content %}
 
 <link rel="stylesheet" type='text/css' href="{% static 'css/login.css' %}">
-
   <div class="bg">
 	<div class="columns ">
 	  <div class="login-box">
@@ -11,6 +10,10 @@
 			{% csrf_token %}
 			<script>
 				const login = () => {
+					document.getElementById("email-error").style.display = 'none';
+					document.getElementById("password-error").style.display = 'none';
+
+
 					axios.defaults.xsrfCookieName = 'csrftoken';
 					axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 					axios.post("/auth/login/",JSON.stringify(
@@ -23,15 +26,35 @@
 							const errors = res.data.errors
 							Object.keys(errors).forEach((key) => {
 								console.log(key, errors[key]);
+								document.getElementById(key + "-error").style.display = "block";
 								const message = document.getElementById(key + "-error");
 								message.innerHTML =  errors[key];
 							});
 						}
 						else {
-							window.location.replace("../../home/");
+							window.location.replace("../../");
 						}
 					})
 					.catch((e)=>console.error(e));
+				}
+				//show password
+				function show_password(id1, id2) {
+					var x = document.getElementById(id1);
+
+					if (x.type === "password") {
+						x.type = "text";
+					} else {
+						x.type = "password";
+					}
+
+					if (id2 !== undefined) {
+						var y = document.getElementById(id2);
+						if (y.type === "password") {
+							y.type = "text";
+						} else {
+							y.type = "password";
+						}
+					}
 				}
 			</script>
 
@@ -39,15 +62,19 @@
 		  <div class="signin" [hidden]="login">
 			<h1 class="topline">Login</h1>
 			<br />
-			<div class="input-field">
-			  <input type="text" 
-			  id="email"
-			  placeholder="@email.com" 
-			  name="email" 
-			  required  
-			  style="background: url(https://res.cloudinary.com/www-santhoshthomas-xyz/image/upload/v1620796341/portfolio/name_1_rgo5hw.png) no-repeat 5%; background-size: 20px;z-index: 50;"
-			  />
-			</div>
+			<div class="placeholder" data-placeholder="@email.com">
+				<div class="input-field">
+				  
+				  <input 
+					  type="text" 
+					  id="email"
+					  name="email" 
+					  placeholder="Enter Email Address"
+			  		  style="background: url(https://res.cloudinary.com/www-santhoshthomas-xyz/image/upload/v1620796341/portfolio/name_1_rgo5hw.png) no-repeat 5%; background-size: 20px;z-index: 50;"
+					  required/>
+				</div>
+			  </div>
+
 			<div id="email-error" class="error"></div>
   
 			<div class="input-field">
@@ -60,6 +87,9 @@
 			  />
 			</div>
 			<div id="password-error" class="error"></div>
+			<div>
+				<input type="checkbox" onclick="show_password('password')">Show Password
+			</div>
 
 			<div class="action">
 			  <a href="../signup">I don't have an account</a>

@@ -17,13 +17,11 @@ Content-Type: application/json
 {
     "first_name": "Nikos",
     "last_name": "Papadopoulos",
-    "email": "email",
-    "phone": "6934782937",
+    "email": "email2",
     "date_of_birth": "2000-12-12",
     "password": "F31l0f0s@",
     "confirm": "F31l0f0s@"
 }
-
 
 ### Login
 
@@ -35,3 +33,22 @@ Content-Type: application/json
     "password": "F31l0f0s@"
 }
 
+### Logout
+
+GET http://127.0.0.1:8000/auth/logout/ HTTP/1.1\r\n
+Content-Type: application/json
+
+### Delete account
+
+GET http://127.0.0.1:8000/accounts/delete/1 HTTP/1.1\r\n
+Content-Type: application/json
+
+### Update account data
+
+PATCH http://127.0.0.1:8000/profile/ HTTP/1.1\r\n
+Content-Type: application/json
+
+{
+    "password": "F31ll0f0s@",
+    "confirm": "F31ll0f0s@"
+}

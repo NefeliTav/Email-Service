@@ -67,6 +67,8 @@ def login(request):
         print("Login successful")
         # start session
         request.session['email'] = email
+        request.session['password'] = password
+
         # valid data -> go to home page
         return JsonResponse(data)
     else:
@@ -107,8 +109,7 @@ def signup(request):
             errors["email2"] = "Invalid email address"
 
         if not valid_password(password):
-            # not pretty
-            errors["password"] = "Invalid password.Requirements:Minimum 8 characters.The letters must be between [a-z].At least one letter should be of Upper Case [A-Z].At least 1 number or digit between [0-9].At least 1 character from [ _ or @ or $ ]."
+            errors["password"] = "Invalid password."
 
         if password != confirm:
             errors["confirm"] = "Passwords are not matching"
@@ -121,12 +122,21 @@ def signup(request):
 
         # valid data -> create user
         try:
-            user = Account.objects.create(first_name=first_name, last_name=last_name, email=email+'@email.com',
-                                          date_of_birth=date_of_birth, password=make_password(password))  # hash password
+            user = Account.objects.create(first_name=first_name,
+                                          last_name=last_name,
+                                          email=email+'@email.com',
+                                          date_of_birth=date_of_birth,
+                                          password=make_password(password))  # hash password
             user.save()
-
             # user is in db
             print('User Created')
+            # start session
+            request.session['first_name'] = first_name
+            request.session['last_name'] = last_name
+            request.session['email'] = email
+            request.session['date_of_birth'] = date_of_birth
+            request.session['password'] = password
+
             # go to home page
             return JsonResponse(data)
         except:
@@ -137,8 +147,49 @@ def signup(request):
         return render(request, "accounts/signup.html", {})
 
 
+@csrf_exempt
 def profile(request):
-    return render(request, "accounts/profile.html", {})
+
+    user_data = {}
+    user_data["first_name"] = request.session.get("first_name")
+    user_data["last_name"] = request.session.get("last_name")
+    user_data["email"] = request.session.get("email")
+    user_data["date_of_birth"] = request.session.get("date_of_birth")
+    user_data["password"] = request.session.get("password")
+
+    if request.method == "PATCH":
+        # read data from client
+        data = json.loads(request.body)
+
+        password = data["password"]
+        confirm = data["confirm"]
+
+        # check if data is valid
+        errors = {}
+        if not valid_password(password):
+            errors["password"] = "Invalid password."
+
+        if password != confirm:
+            errors["confirm"] = "Passwords are not matching"
+
+        if errors != {}:
+            return JsonResponse({'errors': errors})
+
+        # valid data -> update user
+        try:
+            # update password
+            request.session['password'] = password
+            user_data["password"] = password
+            Account.objects.filter(email=request.session.get(
+                "email")).update(password=make_password(password))  # hash password
+            print('User Updated')
+            # go to home page
+            return JsonResponse(user_data)
+        except:
+            # if any problem occurs, try again
+            return render(request, "accounts/profile.html", user_data)
+    else:
+        return render(request, "accounts/profile.html", user_data)
 
 
 def get_accounts(request):
@@ -165,12 +216,15 @@ def delete_account(request, pk):
         account.delete()
         return JsonResponse({"deleted": True}, safe=False)
     except:
-        return JsonResponse({"error": "not a valid primary key"}, safe=False)
+        return JsonResponse({"error": "no account with this id"}, safe=False)
 
 
 def logout(request):
     try:
-        del request.session['email']
+        # print(request.session.session_key)
+        if 'email' in request.session:
+            del request.session['email']
+            request.session.flush()
     except:
         pass
-    return HttpResponse("<strong>You are logged out.</strong>")
+    return redirect("../../")

@@ -188,3 +188,16 @@ body {
   color: red;
   font-style: italic;
 }
+
+.placeholder {
+  position: relative;
+}
+
+.placeholder::after {
+  position: absolute;
+  padding-left: 270px;
+  top: 10px;
+  content: attr(data-placeholder);
+  opacity: 1;
+  font-size: 15px;
+}

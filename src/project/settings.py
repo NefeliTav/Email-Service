@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-import boto3
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -40,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',
 
     'emails',
     'accounts',
@@ -138,6 +136,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 '''
+import boto3
 #DB_ENDPOINT = 'http://localhost:8000/auth/signup'
 #DB_TABLE = 'Account'
 session = boto3.session.Session(
