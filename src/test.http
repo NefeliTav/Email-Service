@@ -3,7 +3,7 @@
 GET http://127.0.0.1:8000/accounts/ HTTP/1.1\r\n
 Content-Type: application/json
 
-### Get account with id = 2
+### Get account with id = 1
 
 GET http://127.0.0.1:8000/accounts/1 HTTP/1.1\r\n
 Content-Type: application/json
@@ -17,7 +17,7 @@ Content-Type: application/json
 {
     "first_name": "Nikos",
     "last_name": "Papadopoulos",
-    "email": "email2",
+    "email": "email",
     "date_of_birth": "2000-12-12",
     "password": "F31l0f0s@",
     "confirm": "F31l0f0s@"
@@ -30,15 +30,15 @@ Content-Type: application/json
 
 {
     "email": "email",
-    "password": "F31l0f0s@"
+    "password": "F31ll0f0s@"
 }
 
 ### Logout
 
-GET http://127.0.0.1:8000/auth/logout/ HTTP/1.1\r\n
+POST http://127.0.0.1:8000/auth/logout/ HTTP/1.1\r\n
 Content-Type: application/json
 
-### Delete account
+### Delete account with id = 1
 
 GET http://127.0.0.1:8000/accounts/delete/1 HTTP/1.1\r\n
 Content-Type: application/json

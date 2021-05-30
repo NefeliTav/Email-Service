@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block content %}
 <h1>Home Page</h1>
 {% endblock %}
+
+<link rel="stylesheet" type='text/css' href="{% static 'css/form.css' %}">
+
+<!-- Logout -->
+<div class="login-box-button" style="padding-left:1600px;padding-top: 40px;position:absolute;">
+    <button type="submit" style="border-radius: 20px;">
+      <i class="fas fa-sign-in-alt"></i>
+      LOGOUT
+    </button>
+</div>
 

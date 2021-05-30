@@ -66,11 +66,11 @@ def login(request):
 
         print("Login successful")
         # start session
-        request.session['email'] = email
+        request.session['email'] = email+'@email.com'
         request.session['password'] = password
 
         # valid data -> go to home page
-        return JsonResponse(data)
+        return JsonResponse({"authenticated": "true"})
     else:
         return render(request, "accounts/login.html", {})
 
@@ -133,12 +133,12 @@ def signup(request):
             # start session
             request.session['first_name'] = first_name
             request.session['last_name'] = last_name
-            request.session['email'] = email
+            request.session['email'] = email+'@email.com'
             request.session['date_of_birth'] = date_of_birth
             request.session['password'] = password
 
             # go to home page
-            return JsonResponse(data)
+            return JsonResponse({"registered": "true"})
         except:
             # if any problem occurs, try again
             return render(request, "accounts/signup.html", {})
@@ -184,7 +184,7 @@ def profile(request):
                 "email")).update(password=make_password(password))  # hash password
             print('User Updated')
             # go to home page
-            return JsonResponse(user_data)
+            return JsonResponse({"updated data": "true"})
         except:
             # if any problem occurs, try again
             return render(request, "accounts/profile.html", user_data)
@@ -193,8 +193,9 @@ def profile(request):
 
 
 def get_accounts(request):
-    accounts = list(Account.objects.values())
-    return JsonResponse(accounts, safe=False)
+    data = {"results": list(Account.objects.all().values(
+        "first_name", "last_name", "email", "date_of_birth"))}
+    return JsonResponse(data)
 
 
 def get_account(request, pk):
@@ -203,9 +204,7 @@ def get_account(request, pk):
             "first_name": account.first_name,
             "last_name": account.last_name,
             "email": account.email,
-            "phone": account.phone,
             "date_of_birth": account.date_of_birth,
-            "password": account.password
             }
     return JsonResponse(data)
 
@@ -219,12 +218,12 @@ def delete_account(request, pk):
         return JsonResponse({"error": "no account with this id"}, safe=False)
 
 
+@csrf_exempt
 def logout(request):
     try:
         # print(request.session.session_key)
-        if 'email' in request.session:
-            del request.session['email']
-            request.session.flush()
+        print(request.session["email"])
+        request.session.flush()
     except:
-        pass
-    return redirect("../../")
+        return JsonResponse({"logged out": "false"})
+    return JsonResponse({"logged out": "true"})

@@ -82,9 +82,9 @@ body {
   position: relative;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   min-width: 400px;
-  min-height: 200px;
   padding: 4rem 3rem;
   background-color: white;
+
 }
 .login-box a {
   text-decoration: none;
@@ -94,6 +94,8 @@ body {
 }
 .login-box .signin {
   animation: fadeIn 0.8s;
+  position: relative;
+
 }
 .login-box .signup {
   animation: fadeIn 0.8s;
@@ -111,7 +113,6 @@ body {
 }
 .login-box .input-field i {
   position: relative;
-  position: absolute;
   top: 10px;
   left: 50px;
 }
@@ -134,7 +135,6 @@ body {
 }
 .login-box-button {
   position: relative;
-  margin-top: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -163,7 +163,6 @@ body {
 .login-box .topline {
   display: inline-block;
   position: relative;
-  position: relative;
 }
 .login-box .topline:after {
   content: "";
@@ -181,9 +180,9 @@ body {
     right: unset !important;
     width: 50px !important;
     max-width: 100px;
+
   }
 }
-
 .error {
   color: red;
   font-style: italic;
@@ -200,4 +199,17 @@ body {
   content: attr(data-placeholder);
   opacity: 1;
   font-size: 15px;
+}
+
+#logout {
+  padding-left: 80%;
+  padding-top: 40px;
+  position: absolute;
+}
+
+@media screen and (max-width: 850px) {
+  #logout {
+    padding-left: 65% !important;
+    padding-top: 15px;
+  }
 }
