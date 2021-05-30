@@ -3,9 +3,9 @@
 GET http://127.0.0.1:8000/accounts/ HTTP/1.1\r\n
 Content-Type: application/json
 
-### Get account with id = 1
+### Get account with specific id
 
-GET http://127.0.0.1:8000/accounts/1 HTTP/1.1\r\n
+GET http://127.0.0.1:8000/accounts/28 HTTP/1.1\r\n
 Content-Type: application/json
 
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 
 {
     "email": "email",
-    "password": "F31ll0f0s@"
+    "password": "F331l0f0s@"
 }
 
 ### Logout
@@ -38,9 +38,9 @@ Content-Type: application/json
 POST http://127.0.0.1:8000/auth/logout/ HTTP/1.1\r\n
 Content-Type: application/json
 
-### Delete account with id = 1
+### Delete account with specific id
 
-GET http://127.0.0.1:8000/accounts/delete/1 HTTP/1.1\r\n
+GET http://127.0.0.1:8000/accounts/delete/28 HTTP/1.1\r\n
 Content-Type: application/json
 
 ### Update account data
@@ -49,6 +49,6 @@ PATCH http://127.0.0.1:8000/profile/ HTTP/1.1\r\n
 Content-Type: application/json
 
 {
-    "password": "F31ll0f0s@",
-    "confirm": "F31ll0f0s@"
+    "password": "F331l0f0s@",
+    "confirm": "F331l0f0s@"
 }

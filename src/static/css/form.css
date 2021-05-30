@@ -84,7 +84,6 @@ body {
   min-width: 400px;
   padding: 4rem 3rem;
   background-color: white;
-
 }
 .login-box a {
   text-decoration: none;
@@ -95,7 +94,6 @@ body {
 .login-box .signin {
   animation: fadeIn 0.8s;
   position: relative;
-
 }
 .login-box .signup {
   animation: fadeIn 0.8s;
@@ -126,9 +124,9 @@ body {
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   width: 100%;
   display: block;
-  padding: 15px 35px;
+  padding: 9px;
   padding-left: 55px;
-  margin: 26px 0;
+  margin: 17px 0;
   border: none;
   border-left: 4px solid #0e1776;
   border-radius: 4px;
@@ -180,7 +178,6 @@ body {
     right: unset !important;
     width: 50px !important;
     max-width: 100px;
-
   }
 }
 .error {
@@ -194,8 +191,8 @@ body {
 
 .placeholder::after {
   position: absolute;
-  padding-left: 270px;
-  top: 10px;
+  padding-left: 260px;
+  top: 5px;
   content: attr(data-placeholder);
   opacity: 1;
   font-size: 15px;

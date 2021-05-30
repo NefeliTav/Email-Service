@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import datetime
 import json
+import jwt
 import re
 
 
@@ -54,8 +55,8 @@ def login(request):
         # authenticate
         errors = {}
         try:
-            obj = Account.objects.get(email=email+'@email.com')
-            if not check_password(password, obj.password):
+            user = Account.objects.get(email=email+'@email.com')
+            if not check_password(password, user.password):
                 errors["password"] = "Wrong password"
         except:
             errors["email"] = "This email address doesn't exist"
@@ -64,13 +65,20 @@ def login(request):
         if errors != {}:
             return JsonResponse({'errors': errors})
 
+        encoded_token = jwt.encode(
+            {'id': user.id}, 'SECRET', algorithm='HS256')
+
         print("Login successful")
         # start session
-        request.session['email'] = email+'@email.com'
-        request.session['password'] = password
+        request.session['jwt'] = encoded_token
 
         # valid data -> go to home page
-        return JsonResponse({"authenticated": "true"})
+        return HttpResponse(
+            json.dumps(encoded_token),
+            status=200,
+            content_type="application/json"
+        )
+
     else:
         return render(request, "accounts/login.html", {})
 
@@ -93,8 +101,8 @@ def signup(request):
         # check if data is valid
         errors = {}
         try:
-            obj = Account.objects.get(email=email+'@email.com')
-            if obj:
+            user = Account.objects.get(email=email+'@email.com')
+            if user:
                 errors["email"] = "This email address already exists"
         except:
             pass
@@ -112,7 +120,7 @@ def signup(request):
             errors["password"] = "Invalid password."
 
         if password != confirm:
-            errors["confirm"] = "Passwords are not matching"
+            errors["confirm"] = "Passwords do not match"
 
         if to_days(date_of_birth) < 4745:  # (365*13), the user is a child
             errors["date_of_birth"] = "You are too young to have an email account!"
@@ -130,15 +138,19 @@ def signup(request):
             user.save()
             # user is in db
             print('User Created')
+
+            encoded_token = jwt.encode(
+                {'id': user.id}, 'SECRET', algorithm='HS256')
             # start session
-            request.session['first_name'] = first_name
-            request.session['last_name'] = last_name
-            request.session['email'] = email+'@email.com'
-            request.session['date_of_birth'] = date_of_birth
-            request.session['password'] = password
+            request.session['jwt'] = encoded_token
 
             # go to home page
-            return JsonResponse({"registered": "true"})
+            return HttpResponse(
+                json.dumps(encoded_token),
+                status=200,
+                content_type="application/json"
+            )
+
         except:
             # if any problem occurs, try again
             return render(request, "accounts/signup.html", {})
@@ -150,12 +162,15 @@ def signup(request):
 @csrf_exempt
 def profile(request):
 
-    user_data = {}
-    user_data["first_name"] = request.session.get("first_name")
-    user_data["last_name"] = request.session.get("last_name")
-    user_data["email"] = request.session.get("email")
-    user_data["date_of_birth"] = request.session.get("date_of_birth")
-    user_data["password"] = request.session.get("password")
+    encoded_token = request.session['jwt']
+    user_id = jwt.decode(encoded_token, 'SECRET', algorithms=['HS256'])['id']
+    account = Account.objects.get(id=user_id)
+    data = {"id": account.id,
+            "first_name": account.first_name,
+            "last_name": account.last_name,
+            "email": account.email,
+            "date_of_birth": str(account.date_of_birth)
+            }
 
     if request.method == "PATCH":
         # read data from client
@@ -170,7 +185,7 @@ def profile(request):
             errors["password"] = "Invalid password."
 
         if password != confirm:
-            errors["confirm"] = "Passwords are not matching"
+            errors["confirm"] = "Passwords do not match"
 
         if errors != {}:
             return JsonResponse({'errors': errors})
@@ -178,23 +193,25 @@ def profile(request):
         # valid data -> update user
         try:
             # update password
-            request.session['password'] = password
-            user_data["password"] = password
-            Account.objects.filter(email=request.session.get(
-                "email")).update(password=make_password(password))  # hash password
-            print('User Updated')
-            # go to home page
-            return JsonResponse({"updated data": "true"})
+            Account.objects.filter(id=user_id).update(
+                password=make_password(password))  # hash password
         except:
             # if any problem occurs, try again
-            return render(request, "accounts/profile.html", user_data)
+            return render(request, "accounts/profile.html", {"token": encoded_token})
+
+        print('User Updated')
+
+        # go to home page
+        return JsonResponse({"user": "updated"})
+
     else:
-        return render(request, "accounts/profile.html", user_data)
+        print(data)
+        return render(request, "accounts/profile.html", data)
 
 
 def get_accounts(request):
-    data = {"results": list(Account.objects.all().values(
-        "first_name", "last_name", "email", "date_of_birth"))}
+    data = {"results": list(Account.objects.all().values("id",
+                                                         "first_name", "last_name", "email", "date_of_birth"))}
     return JsonResponse(data)
 
 
@@ -204,7 +221,7 @@ def get_account(request, pk):
             "first_name": account.first_name,
             "last_name": account.last_name,
             "email": account.email,
-            "date_of_birth": account.date_of_birth,
+            "date_of_birth": account.date_of_birth
             }
     return JsonResponse(data)
 
@@ -222,7 +239,7 @@ def delete_account(request, pk):
 def logout(request):
     try:
         # print(request.session.session_key)
-        print(request.session["email"])
+        del request.session["jwt"]
         request.session.flush()
     except:
         return JsonResponse({"logged out": "false"})
