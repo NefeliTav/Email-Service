@@ -5,12 +5,17 @@
 <link rel="stylesheet" type='text/css' href="{% static 'css/form.css' %}">
 
   <div class="bg">
-	<div class="login-box-button" id="logout">
-		<button type="submit" style="border-radius: 20px;"onclick="logout();return false;" >
-		  <i class="fas fa-sign-in-alt"></i>
-		  LOGOUT
-		</button>
-	</div>
+		<div class="login-box-button" id="logout">
+			<button id="breadcrumb" type="submit" style="border-radius: 20px;" onclick="window.location.href='../'" >
+				<i class="fas fa-sign-in-alt"></i>
+				HOME
+				</button>
+			<button type="submit" style="border-radius: 20px;"onclick="logout();return false;" >
+			<i class="fas fa-sign-in-alt"></i>
+			LOGOUT
+			</button>
+		</div>
+	
 	<div class="columns ">
 		
 	  <div class="login-box">
@@ -18,6 +23,10 @@
 			{% csrf_token %}
 
 			<script>
+				
+				
+
+
 				const logout = () => {
 					axios.defaults.xsrfCookieName = 'csrftoken';
 					axios.defaults.xsrfHeaderName = 'X-CSRFToken';

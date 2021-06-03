@@ -162,51 +162,55 @@ def signup(request):
 @csrf_exempt
 def profile(request):
 
-    encoded_token = request.session['jwt']
-    user_id = jwt.decode(encoded_token, 'SECRET', algorithms=['HS256'])['id']
-    account = Account.objects.get(id=user_id)
-    data = {"id": account.id,
-            "first_name": account.first_name,
-            "last_name": account.last_name,
-            "email": account.email,
-            "date_of_birth": str(account.date_of_birth)
-            }
+    if "jwt" in request.session:
 
-    if request.method == "PATCH":
-        # read data from client
-        data = json.loads(request.body)
+        encoded_token = request.session['jwt']
+        user_id = jwt.decode(encoded_token, 'SECRET',
+                             algorithms=['HS256'])['id']
+        account = Account.objects.get(id=user_id)
+        data = {"id": account.id,
+                "first_name": account.first_name,
+                "last_name": account.last_name,
+                "email": account.email,
+                "date_of_birth": str(account.date_of_birth)
+                }
 
-        password = data["password"]
-        confirm = data["confirm"]
+        if request.method == "PATCH":
+            # read data from client
+            data = json.loads(request.body)
 
-        # check if data is valid
-        errors = {}
-        if not valid_password(password):
-            errors["password"] = "Invalid password."
+            password = data["password"]
+            confirm = data["confirm"]
 
-        if password != confirm:
-            errors["confirm"] = "Passwords do not match"
+            # check if data is valid
+            errors = {}
+            if not valid_password(password):
+                errors["password"] = "Invalid password."
 
-        if errors != {}:
-            return JsonResponse({'errors': errors})
+            if password != confirm:
+                errors["confirm"] = "Passwords do not match"
 
-        # valid data -> update user
-        try:
-            # update password
-            Account.objects.filter(id=user_id).update(
-                password=make_password(password))  # hash password
-        except:
-            # if any problem occurs, try again
-            return render(request, "accounts/profile.html", {"token": encoded_token})
+            if errors != {}:
+                return JsonResponse({'errors': errors})
 
-        print('User Updated')
+            # valid data -> update user
+            try:
+                # update password
+                Account.objects.filter(id=user_id).update(
+                    password=make_password(password))  # hash password
+            except:
+                # if any problem occurs, try again
+                return render(request, "accounts/profile.html", {"token": encoded_token})
 
-        # go to home page
-        return JsonResponse({"user": "updated"})
+            print('User Updated')
 
+            # go to home page
+            return JsonResponse({"user": "updated"})
+
+        else:
+            return render(request, "accounts/profile.html", data)
     else:
-        print(data)
-        return render(request, "accounts/profile.html", data)
+        return redirect("/auth/login")
 
 
 def get_accounts(request):

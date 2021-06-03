@@ -154,7 +154,7 @@
             text-decoration-none
           "
         >
-          <span class="fs-4">Welcome, email@domain.com</span>
+          <span class="fs-4">Welcome, {{ email }}</span>
         </a>
         <hr />
         <ul id="email-menu" class="nav nav-pills flex-column mb-auto">
@@ -260,7 +260,7 @@
               height="32"
               class="rounded-circle me-2"
             />
-            <strong>Name of the user</strong>
+            <strong>{{ first_name }}</strong>
           </a>
           <ul
             class="dropdown-menu text-small shadow"
@@ -268,7 +268,7 @@
           >
             <li><a class="dropdown-item" href="/profile/">Profile</a></li>
             <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="#">Sign out</a></li>
+            <li><a class="dropdown-item" onclick="logout();return false;" href="#">Sign out</a></li>
           </ul>
         </div>
       </div>
@@ -333,6 +333,17 @@
         let element = $(this.children);
         element.addClass("active");
       });
+    </script>
+    <script>
+				const logout = () => {
+					axios.defaults.xsrfCookieName = 'csrftoken';
+					axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+					axios.post("/auth/logout/"
+					).then((res)=>{
+						window.location.replace("../auth/login");
+					})
+					.catch((e)=>console.error(e));
+				}
     </script>
 {% endblock %}
 
