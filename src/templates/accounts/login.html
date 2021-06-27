@@ -13,7 +13,6 @@
 					document.getElementById("email-error").style.display = 'none';
 					document.getElementById("password-error").style.display = 'none';
 
-
 					axios.defaults.xsrfCookieName = 'csrftoken';
 					axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 					axios.post("/auth/login/",JSON.stringify(

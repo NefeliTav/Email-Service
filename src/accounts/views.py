@@ -78,7 +78,6 @@ def login(request):
             status=200,
             content_type="application/json"
         )
-
     else:
         return render(request, "accounts/login.html", {})
 

@@ -5,7 +5,7 @@ Content-Type: application/json
 
 ### Get account with specific id
 
-GET http://127.0.0.1:8000/accounts/28 HTTP/1.1\r\n
+GET http://127.0.0.1:8000/accounts/32 HTTP/1.1\r\n
 Content-Type: application/json
 
 
@@ -30,7 +30,7 @@ Content-Type: application/json
 
 {
     "email": "email",
-    "password": "F331l0f0s@"
+    "password": "F31l0f0s@"
 }
 
 ### Logout
@@ -40,7 +40,7 @@ Content-Type: application/json
 
 ### Delete account with specific id
 
-GET http://127.0.0.1:8000/accounts/delete/28 HTTP/1.1\r\n
+DELETE http://127.0.0.1:8000/accounts/delete/33 HTTP/1.1\r\n
 Content-Type: application/json
 
 ### Update account data

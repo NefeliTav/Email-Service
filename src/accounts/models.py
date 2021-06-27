@@ -1,3 +1,7 @@
+from pynamodb.attributes import (
+    UnicodeAttribute, UTCDateTimeAttribute
+)
+from pynamodb.models import Model
 import datetime
 from django.db import models
 
@@ -12,10 +16,6 @@ class Account(models.Model):
 
 
 '''
-from pynamodb.models import Model
-from pynamodb.attributes import (
-    UnicodeAttribute, UTCDateTimeAttribute
-)
 
 class Account(Model):
     class Meta:
@@ -33,6 +33,7 @@ class Account(Model):
     phone = UnicodeAttribute()
     date_of_birth = UTCDateTimeAttribute(default=datetime.date.today)
     password = UnicodeAttribute()
+
 
 from dynamorm import DynaModel
 from marshmallow import fields
