@@ -159,7 +159,7 @@
         <hr />
         <ul id="email-menu" class="nav nav-pills flex-column mb-auto">
           <li class="nav-item" id="inbox">
-            <a href="#" class="nav-link active" aria-current="page">
+            <a href="#" class="nav-link active" aria-current="page" id="one">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -177,7 +177,7 @@
             </a>
           </li>
           <li class="nav-item" id="spam">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link" id="two">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -194,12 +194,11 @@
                 />
                 <use xlink:href="#spam" />
               </svg>
-
               Spam
             </a>
           </li>
           <li class="nav-item" id="sent-mails">
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link" id="three">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -276,34 +275,164 @@
       <!--
       <div class="b-example-divider"></div>-->
 
-      <div
-        class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
-        style="width: 380px"
-      >
-        <div class="list-group list-group-flush border-bottom scrollarea">
-          {% for i in mailbox %}
+        <div id="inbox-list">
+        <div
+          class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
+          style="width: 380px"
+        >
+          <div class="list-group list-group-flush border-bottom scrollarea">
+            {% for i in mailbox %}
 
-          <a
-            href="#"
-            class="list-group-item list-group-item-action active py-3 lh-tight"
-            aria-current="true"
-          >
-            <div
-              class="d-flex w-100 align-items-center justify-content-between"
+            <a
+              href="#"
+              class="list-group-item list-group-item-action active py-3 lh-tight"
+              aria-current="true"
             >
-              <strong class="mb-1">{{i.subject}}</strong>
-              <small>Wed</small>
-            </div>
-            <div class="col-10 mb-1 small">From: {{i.sender}}</div>
-          </a>
+              <div
+                class="d-flex w-100 align-items-center justify-content-between"
+              >
+                <strong class="mb-1">{{i.subject}}</strong>
+                <small>{{i.date}}</small>
+              </div>
+              <div class="col-10 mb-1 small">From: {{i.sender}}</div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+        
+      <div id="spam-list" style="display:none;">
 
+        <div 
+          class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
+          style="width: 380px;"
+        >
+          <div class="list-group list-group-flush border-bottom scrollarea">
+            {% for i in spam_list %}
 
-          {% endfor %}
-
+            <a
+              href="#"
+              class="list-group-item list-group-item-action active py-3 lh-tight"
+              aria-current="true"
+            >
+              <div
+                class="d-flex w-100 align-items-center justify-content-between"
+              >
+                <strong class="mb-1">{{i.subject}}</strong>
+                <small>{{i.date}}</small>
+              </div>
+              <div class="col-10 mb-1 small">From: {{i.sender}}</div>
+            </a>
+            {% endfor %}
+          </div>
         </div>
       </div>
 
+
+      <div id="sent-list" style="display:none;">
+        <div
+          class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
+          style="width: 380px;"sent-list
+        >
+          <div class="list-group list-group-flush border-bottom scrollarea">
+            {% for i in sent_emails %}
+
+            <a
+              href="#"
+              class="list-group-item list-group-item-action active py-3 lh-tight"
+              aria-current="true"
+            >
+              <div
+                class="d-flex w-100 align-items-center justify-content-between"
+              >
+                <strong class="mb-1">{{i.subject}}</strong>
+                <small>{{i.date}}</small>
+              </div>
+              <div class="col-10 mb-1 small">From: {{i.sender}}</div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
       <div class="b-example-divider"></div>
+
+
+
+      
+      <div>
+        <form action="" onsubmit="send(); return false;">
+          {% csrf_token %}
+      
+          <script>
+              const send = () => {
+                  document.getElementById("receiver-error").style.display = 'none';
+      
+                  axios.defaults.xsrfCookieName = 'csrftoken';
+                  axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+                  axios.post("/send/",JSON.stringify(
+                      {
+                          'receiver':document.getElementById("receiver").value,
+                          'subject':document.getElementById("subject").value,
+                          'content':document.getElementById("content").value
+                      })
+                  ).then((res)=>{
+                      if (res.data.errors) {
+                          const errors = res.data.errors
+                          Object.keys(errors).forEach((key) => {
+                              console.log(key, errors[key]);
+                              document.getElementById(key + "-error").style.display = "block";
+                              const message = document.getElementById(key + "-error");
+                              message.innerHTML =  errors[key];
+                          });
+                      }
+                      else {
+                          window.location.replace("../");
+                      }
+                  })
+                  .catch((e)=>console.error(e));
+              }
+          </script>
+          
+          <label>From:</label>
+          <input 
+          type="text"
+          id="sender"
+          placeholder="{{ email }}"
+          name="sender"
+          required
+          readonly/><br>
+          
+          <label>To:</label>
+          <input 
+          type="text"
+          id="receiver"
+          placeholder=""
+          name="receiver"
+          required/><br>
+          <div id="receiver-error" class="error"></div>
+      
+          <label>Subject:</label>
+          <input 
+          type="text"
+          id="subject"
+          name="subject"/><br>
+      
+          <label>Text:</label>
+          <textarea 
+          id="content"
+          name="content"
+          required></textarea><br>
+      
+          <button type="submit" style="border-radius: 20px;">
+              <i class="fas fa-sign-in-alt"></i>
+              SEND
+            </button>
+          </form>
+
+
+
+
+      </div>
     </main>
 
     <script
@@ -325,6 +454,32 @@
 
         let element = $(this.children);
         element.addClass("active");
+
+        var myElement = document.getElementById('one');
+        if(myElement === document.activeElement){
+          document.getElementById("sent-list").style.display = "none";
+          document.getElementById("spam-list").style.display = "none";
+          document.getElementById("inbox-list").style.display = "block";
+        }
+
+        var myElement = document.getElementById('two');
+        if(myElement === document.activeElement){
+          document.getElementById("spam-list").style.display = "block";
+          document.getElementById("inbox-list").style.display = "none";
+          document.getElementById("sent-list").style.display = "none";
+
+        }
+
+        var myElement = document.getElementById('three');
+        if(myElement === document.activeElement){
+          document.getElementById("sent-list").style.display = "block";
+          document.getElementById("spam-list").style.display = "none";
+          document.getElementById("inbox-list").style.display = "none";
+        }
+
+
+
+
       });
     </script>
     <script>
@@ -338,5 +493,6 @@
 					.catch((e)=>console.error(e));
 				}
     </script>
+    
 {% endblock %}
 

@@ -98,7 +98,7 @@ def send(request):
 
             except:
                 # if any problem occurs, try again
-                return render(request, "accounts/send.html", data)
+                return render(request, "email.html", data)
 
         """else:
             try:
@@ -107,22 +107,23 @@ def send(request):
                                              text=content,
                                              subject=subject)
                 email.save()
-                # email is in db
+                # email is in dbemails
 
                 smtpObj = smtplib.SMTP('localhost')
                 smtpObj.sendmail(data["email"], receiver, content)
                 print("Successfully sent email")
             except:
                 # if any problem occurs, try again
-                return render(request, "accounts/send.html", data)
+                return render(request, "email.html", data)
 
+        """
         # valid data -> go to home page
         return HttpResponse(
             json.dumps(request.session['jwt']),
             status=200,
             content_type="application/json"
-        )"""
+        )
 
     else:
 
-        return render(request, 'accounts/send.html', data)
+        return render(request, 'email.html', data)
