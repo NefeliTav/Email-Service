@@ -5,3 +5,4 @@ antispam==0.0.10
 Django==3.2.3
 PyJWT==2.1.0
 python-dotenv==0.18.0
+django-cors-headers==3.7.0
