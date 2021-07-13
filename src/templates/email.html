@@ -360,7 +360,7 @@
 
       
       <div>
-        <form action="" onsubmit="send(); return false;">
+        <form action="" onsubmit="send(); return false;" style="padding-left: 50px;padding-top:50px;">
           {% csrf_token %}
       
           <script>
@@ -392,9 +392,11 @@
                   .catch((e)=>console.error(e));
               }
           </script>
+
           
-          <label>From:</label>
+          <label>From:</label><br>
           <input 
+          style="border-radius: 30px;"
           type="text"
           id="sender"
           placeholder="{{ email }}"
@@ -402,8 +404,9 @@
           required
           readonly/><br>
           
-          <label>To:</label>
+          <label>To:</label><br>
           <input 
+          style="border-radius: 30px;"
           type="text"
           id="receiver"
           placeholder=""
@@ -411,14 +414,15 @@
           required/><br>
           <div id="receiver-error" class="error"></div>
       
-          <label>Subject:</label>
+          <label>Subject:</label><br>
           <input 
+          style="border-radius: 30px;"
           type="text"
           id="subject"
-          name="subject"/><br>
+          name="subject"/><br><br>
       
-          <label>Text:</label>
-          <textarea 
+          <label>Text:</label><br>
+          <textarea style="width: 500px;height: 300px;border-radius: 30px;"
           id="content"
           name="content"
           required></textarea><br>

@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .models import Email
 from accounts.models import Account
 from validate_email import validate_email
+from django.db.models import Q
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -27,18 +28,24 @@ def home_view(request):
             encoded_token = request.session['jwt']
             user_id = jwt.decode(encoded_token, 'SECRET',
                                  algorithms=['HS256'])['id']
-            print(user_id)
+            # print(user_id)
             account = Account.objects.get(id=user_id)
 
-            mailbox = list(Email.objects.filter(receiver=account.email))
-            sent_emails = list(Email.objects.filter(sender=account.email))
+            # organize emails in categories
 
-            spam_list = []
-            for x in mailbox:
-                if antispam.is_spam(x.text):
-                    spam_list.append(x)
-                    mailbox.remove(x)
+            mailbox = list(Email.objects.filter(
+                receiver=account.email))  # inbox
+            sent_emails = list(Email.objects.filter(
+                sender=account.email))  # sent
 
+            criterion1 = Q(receiver=account.email)
+            criterion2 = Q(isSpam=True)
+            spam_list = list(
+                Email.objects.filter(criterion1 & criterion2))  # spam
+
+            # print(spam_list)
+
+            # pass to frontend
             data = {"id": account.id,
                     "first_name": account.first_name,
                     "last_name": account.last_name,
@@ -84,39 +91,30 @@ def send(request):
         if errors != {}:
             return JsonResponse({'errors': errors})
 
+        if antispam.is_spam(content):   # check if email is spam
+            isSpam = True
+        else:
+            isSpam = False
+
+        print(isSpam)
+
         # valid data -> send email
-        if '@email' in receiver:
-            try:
-                email = Email.objects.create(sender=data["email"],
-                                             receiver=receiver,
-                                             text=content,
-                                             subject=subject)
-                email.save()
+        try:
+            email = Email.objects.create(sender=data["email"],
+                                         receiver=receiver,
+                                         text=content,
+                                         subject=subject,
+                                         isSpam=isSpam)
 
-                # email is in db
-                print('Email Sent')
+            email.save()
 
-            except:
-                # if any problem occurs, try again
-                return render(request, "email.html", data)
+            # email is in db
+            print('Email Sent')
 
-        """else:
-            try:
-                email = Email.objects.create(sender=data["email"],
-                                             receiver=receiver,
-                                             text=content,
-                                             subject=subject)
-                email.save()
-                # email is in dbemails
+        except:
+            # if any problem occurs, try again
+            return render(request, "email.html", data)
 
-                smtpObj = smtplib.SMTP('localhost')
-                smtpObj.sendmail(data["email"], receiver, content)
-                print("Successfully sent email")
-            except:
-                # if any problem occurs, try again
-                return render(request, "email.html", data)
-
-        """
         # valid data -> go to home page
         return HttpResponse(
             json.dumps(request.session['jwt']),
