@@ -19,7 +19,6 @@ import smtplib
 from email.message import EmailMessage
 import antispam
 
-
 def home_view(request):
     if request.method == "POST":
         pass
@@ -33,15 +32,13 @@ def home_view(request):
 
             # organize emails in categories
 
-            mailbox = list(Email.objects.filter(
-                receiver=account.email))  # inbox
-            sent_emails = list(Email.objects.filter(
-                sender=account.email))  # sent
+            is_receiver = Q(receiver=account.email)
+            is_sender = Q(sender=account.email)
+            is_spam = Q(isSpam=True)
 
-            criterion1 = Q(receiver=account.email)
-            criterion2 = Q(isSpam=True)
-            spam_list = list(
-                Email.objects.filter(criterion1 & criterion2))  # spam
+            mailbox = list(Email.objects.filter(is_receiver & ~is_spam))  # inbox
+            sent_emails = list(Email.objects.filter(is_sender))  # sent
+            spam_list = list(Email.objects.filter(is_receiver & is_spam))  # spam
 
             # print(spam_list)
 
@@ -58,7 +55,6 @@ def home_view(request):
             return render(request, 'email.html', data)
         else:
             return redirect("/auth/login")
-
 
 @csrf_exempt
 def send(request):
