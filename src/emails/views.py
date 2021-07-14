@@ -34,15 +34,12 @@ def home_view(request):
 
             # organize emails in categories
 
-            is_receiver = Q(receiver=account.email)
-            is_sender = Q(sender=account.email)
-            is_spam = Q(isSpam=True)
-
-            mailbox = list(Email.objects.filter(is_receiver & ~is_spam))  # inbox
-            sent_emails = list(Email.objects.filter(is_sender))  # sent
-            spam_list = list(Email.objects.filter(is_receiver & is_spam))  # spam
-
-            # print(spam_list)
+            mailbox = emailutils.get_emails(
+                    receiver=account.email, is_spam=False)
+            sent_emails = emailutils.get_emails(
+                    sender=account.email)
+            spam_list = emailutils.get_emails(
+                    receiver=account.email, is_spam=True)
 
             # pass to frontend
             data = {"id": account.id,
@@ -89,23 +86,28 @@ def send(request):
         if errors != {}:
             return JsonResponse({'errors': errors})
 
-        isSpam = emailutils.is_spam(subject, content)   # check if email is spam
+        # check if email is spam
+        try:
+            is_spam = emailutils.is_spam(subject=subject,
+                                         content=content)
+        except:
+            print('Skip spam check')
+            is_spam = True
 
         # valid data -> send email
         try:
-            email = Email.objects.create(sender=data["email"],
-                                         receiver=receiver,
-                                         text=content,
-                                         subject=subject,
-                                         isSpam=isSpam)
-
-            email.save()
+            emailutils.save_email(sender=data["email"],
+                                  receiver=receiver,
+                                  content=content,
+                                  subject=subject,
+                                  is_spam=is_spam)
 
             # email is in db
             print('Email Sent')
 
         except:
             # if any problem occurs, try again
+            print('Email is not saved in DB')
             return render(request, "email.html", data)
 
         # valid data -> go to home page

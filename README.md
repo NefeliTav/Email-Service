@@ -1,21 +1,15 @@
 # Email-Service
 
-## Run
+## Run webserver
 
 python manage.py makemigrations \
 python manage.py migrate \
 python manage.py runserver
 
-### Antispam
+## Run docker services
+
+Antispam, emaildb
 
 ```
-cd antispam
-flusk run
-```
-
-or to run in docker:
-
-```
-cd antispam
-bash run.sh
+docker-compose up
 ```
