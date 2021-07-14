@@ -9,7 +9,7 @@ import datetime
 import json
 import jwt
 import re
-
+import accounts.utils as accountutils
 
 def valid_password(psw):
     '''
@@ -28,12 +28,9 @@ def valid_password(psw):
         return False
     elif not re.search("[0-9]", psw):
         return False
-    elif not re.search("[_@$]", psw):
-        return False
     elif re.search("\s", psw):
         return False
     return True
-
 
 def to_days(then):
     now = datetime.datetime.now()
@@ -41,7 +38,6 @@ def to_days(then):
     diff = (now.date() - date_time_obj)
     diff = str(diff).split(' ')
     return int(diff[0])
-
 
 @csrf_exempt
 def login(request):
@@ -55,8 +51,8 @@ def login(request):
         # authenticate
         errors = {}
         try:
-            user = Account.objects.get(email=email+'@email.com')
-            if not check_password(password, user.password):
+            account = accountutils.get_account(email=email+'@email.com')
+            if not check_password(password, account.password):
                 errors["password"] = "Wrong password"
         except:
             errors["email"] = "This email address doesn't exist"
@@ -66,7 +62,7 @@ def login(request):
             return JsonResponse({'errors': errors})
 
         encoded_token = jwt.encode(
-            {'id': user.id}, 'SECRET', algorithm='HS256')
+            {'id': account.user_id}, 'SECRET', algorithm='HS256')
 
         print("Login successful")
         # start session
@@ -80,7 +76,6 @@ def login(request):
         )
     else:
         return render(request, "accounts/login.html", {})
-
 
 @csrf_exempt
 def signup(request):
@@ -100,8 +95,8 @@ def signup(request):
         # check if data is valid
         errors = {}
         try:
-            user = Account.objects.get(email=email+'@email.com')
-            if user:
+            account = accountutils.get_account(email=email+'@email.com')
+            if account:
                 errors["email"] = "This email address already exists"
         except:
             pass
@@ -129,17 +124,16 @@ def signup(request):
 
         # valid data -> create user
         try:
-            user = Account.objects.create(first_name=first_name,
-                                          last_name=last_name,
-                                          email=email+'@email.com',
-                                          date_of_birth=date_of_birth,
-                                          password=make_password(password))  # hash password
-            user.save()
+            account = accountutils.create_account(first_name=first_name,
+                                                  last_name=last_name,
+                                                  email=email+'@email.com',
+                                                  date_of_birth=date_of_birth,
+                                                  password=make_password(password))  # hash password
             # user is in db
             print('User Created')
 
             encoded_token = jwt.encode(
-                {'id': user.id}, 'SECRET', algorithm='HS256')
+                {'id': account.id}, 'SECRET', algorithm='HS256')
             # start session
             request.session['jwt'] = encoded_token
 
@@ -157,7 +151,6 @@ def signup(request):
     else:
         return render(request, "accounts/signup.html", {})
 
-
 @csrf_exempt
 def profile(request):
 
@@ -166,7 +159,7 @@ def profile(request):
         encoded_token = request.session['jwt']
         user_id = jwt.decode(encoded_token, 'SECRET',
                              algorithms=['HS256'])['id']
-        account = Account.objects.get(id=user_id)
+        account = accountutils.get_account(user_id=user_id)
         data = {"id": account.id,
                 "first_name": account.first_name,
                 "last_name": account.last_name,
@@ -195,8 +188,8 @@ def profile(request):
             # valid data -> update user
             try:
                 # update password
-                Account.objects.filter(id=user_id).update(
-                    password=make_password(password))  # hash password
+                accountutils.update_password(user_id=user_id,
+                                             password=make_password(password))
             except:
                 # if any problem occurs, try again
                 return render(request, "accounts/profile.html", {"token": encoded_token})
@@ -210,33 +203,6 @@ def profile(request):
             return render(request, "accounts/profile.html", data)
     else:
         return redirect("/auth/login")
-
-
-def get_accounts(request):
-    data = {"results": list(Account.objects.all().values("id",
-                                                         "first_name", "last_name", "email", "date_of_birth"))}
-    return JsonResponse(data)
-
-
-def get_account(request, pk):
-    account = get_object_or_404(Account, pk=pk)
-    data = {"id": account.id,
-            "first_name": account.first_name,
-            "last_name": account.last_name,
-            "email": account.email,
-            "date_of_birth": account.date_of_birth
-            }
-    return JsonResponse(data)
-
-
-def delete_account(request, pk):
-    try:
-        account = Account.objects.get(pk=pk)
-        account.delete()
-        return JsonResponse({"deleted": True}, safe=False)
-    except:
-        return JsonResponse({"error": "no account with this id"}, safe=False)
-
 
 @csrf_exempt
 def logout(request):

@@ -150,3 +150,7 @@ ANTISPAM_CHECK_URL = 'http://127.0.0.1:5000'
 EMAILDB_HOST = "127.0.0.1:27017"
 EMAILDB_USERNAME = 'emaildb_client'
 EMAILDB_PASSWORD = 'hiddenpassword'
+
+USERDB_HOST = "127.0.0.1:27117"
+USERDB_USERNAME = 'userdb_client'
+USERDB_PASSWORD = 'hiddenpassword'

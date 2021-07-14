@@ -20,6 +20,7 @@ from email.message import EmailMessage
 import antispam
 
 import emails.utils as emailutils
+import accounts.utils as accountutils
 
 def home_view(request):
     if request.method == "POST":
@@ -30,7 +31,7 @@ def home_view(request):
             user_id = jwt.decode(encoded_token, 'SECRET',
                                  algorithms=['HS256'])['id']
             # print(user_id)
-            account = Account.objects.get(id=user_id)
+            account = accountutils.get_account(user_id=user_id)
 
             # organize emails in categories
 
@@ -61,7 +62,7 @@ def send(request):
     encoded_token = request.session['jwt']
     user_id = jwt.decode(encoded_token, 'SECRET',
                          algorithms=['HS256'])['id']
-    account = Account.objects.get(id=user_id)
+    account = accountutils.get_account(user_id=user_id)
     data = {"id": account.id,
             "first_name": account.first_name,
             "last_name": account.last_name,
