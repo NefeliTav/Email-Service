@@ -12,3 +12,10 @@ python manage.py runserver
 cd antispam
 flusk run
 ```
+
+or to run in docker:
+
+```
+cd antispam
+bash run.sh
+```

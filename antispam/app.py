@@ -4,7 +4,7 @@ import antispam
 
 app = Flask(__name__)
 
-@app.route("/check", methods=["POST"])
+@app.route("/", methods=["POST"])
 def check():
     json = request.json
     subject = json['subject']
@@ -23,3 +23,6 @@ def check():
     is_spam = is_spam_subject or is_spam_content
 
     return jsonify(is_spam=is_spam)
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
