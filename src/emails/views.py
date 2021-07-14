@@ -19,6 +19,8 @@ import smtplib
 from email.message import EmailMessage
 import antispam
 
+import emails.utils as emailutils
+
 def home_view(request):
     if request.method == "POST":
         pass
@@ -87,12 +89,7 @@ def send(request):
         if errors != {}:
             return JsonResponse({'errors': errors})
 
-        if antispam.is_spam(content):   # check if email is spam
-            isSpam = True
-        else:
-            isSpam = False
-
-        print(isSpam)
+        isSpam = emailutils.is_spam(subject, content)   # check if email is spam
 
         # valid data -> send email
         try:
