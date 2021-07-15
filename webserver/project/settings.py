@@ -129,19 +129,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-'''
-import boto3
-#DB_ENDPOINT = 'http://localhost:8000/auth/signup'
-#DB_TABLE = 'Account'
-session = boto3.session.Session(
-    aws_access_key_id=None,
-    aws_secret_access_key=None,
-    aws_session_token=None,
-    region_name=None
-)
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table("Account")
-'''
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 

@@ -394,41 +394,31 @@
           </script>
 
           
-          <label>From:</label><br>
-          <input 
-          style="border-radius: 30px;"
-          type="text"
-          id="sender"
-          placeholder="{{ email }}"
-          name="sender"
-          required
-          readonly/><br>
-          
           <label>To:</label><br>
           <input 
-          style="border-radius: 30px;"
+          style="border-radius: 30px;outline:none;padding-left:10px;"
           type="text"
           id="receiver"
           placeholder=""
           name="receiver"
           required/><br>
           <div id="receiver-error" class="error"></div>
-      
+
           <label>Subject:</label><br>
           <input 
-          style="border-radius: 30px;"
+          style="border-radius: 30px;outline:none;padding-left:10px;"
           type="text"
           id="subject"
           name="subject"/><br><br>
-      
+
           <label>Text:</label><br>
-          <textarea style="width: 500px;height: 300px;border-radius: 30px;"
+          <textarea style="width: 500px;height: 300px;border-radius: 30px;outline:none;padding-left:15px;"
           id="content"
           name="content"
           required></textarea><br>
-      
-          <button type="submit" style="border-radius: 20px;">
-              <i class="fas fa-sign-in-alt"></i>
+
+          <button type="submit" style="width:80px;height:40px;border-radius: 20px;background-color: #0D6EFD;color:white;padding: 0;
+          border: none;margin-top:10px;">
               SEND
             </button>
           </form>
