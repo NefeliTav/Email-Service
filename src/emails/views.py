@@ -17,7 +17,6 @@ import re
 
 import smtplib
 from email.message import EmailMessage
-import antispam
 
 import emails.utils as emailutils
 import accounts.utils as accountutils

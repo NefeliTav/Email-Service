@@ -11,6 +11,8 @@ import jwt
 import re
 import accounts.utils as accountutils
 
+import emails.utils as eu
+
 def valid_password(psw):
     '''
     Function taken from https://www.geeksforgeeks.org/python-program-check-validity-password/

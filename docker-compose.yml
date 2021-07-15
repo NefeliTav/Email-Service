@@ -1,4 +1,12 @@
 services:
+    webserver:
+        build: "src"
+        ports:
+            - "8000:8000"
+        links:
+            - "antispam"
+            - "emaildb"
+            - "userdb"
     antispam:
         build: "antispam"
         ports:

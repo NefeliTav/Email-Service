@@ -1,7 +1,3 @@
-from pynamodb.attributes import (
-    UnicodeAttribute, UTCDateTimeAttribute
-)
-from pynamodb.models import Model
 import datetime
 from django.db import models
 
