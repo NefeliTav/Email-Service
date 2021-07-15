@@ -1,6 +1,6 @@
 services:
     webserver:
-        build: "src"
+        build: "webserver"
         ports:
             - "8000:8000"
         links:
