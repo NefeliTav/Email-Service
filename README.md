@@ -1,14 +1,14 @@
 # Email-Service
 
-## Run webserver
+## Setup
 
-python manage.py makemigrations \
-python manage.py migrate \
-python manage.py runserver
+```
+pip install -r requirements.txt
+```
 
-## Run docker services
+## Run
 
-Antispam, emaildb
+Webserver, antispam, emaildb, userdb
 
 ```
 docker-compose up
