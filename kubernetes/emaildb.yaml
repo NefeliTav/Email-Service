@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emaildb
+  labels:
+    app: emaildb
+spec:
+  #serviceName: emaildb-service
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emaildb
+  template:
+    metadata:
+      labels:
+        app: emaildb
+#        role: emaildb
+#        environment: test
+#        replicaset: MainRepSet
+    spec:
+#      terminationGracePeriodSeconds: 10
+      containers:
+        - name: emaildb-container
+          image: mongo:5.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+#            - "mongod"
+#            - "--bind_ip"
+#            - "0.0.0.0"
+#            - "--replSet"
+#            - "MainRepSet"
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: emaildb_client
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: hiddenpassword
+          ports:
+            - containerPort: 27017
+#          volumeMounts:
+#            - name: mongodb-persistent-storage-claim
+#              mountPath: /data/db
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: mongodb-persistent-storage-claim
+#      annotations:
+#        volume.beta.kubernetes.io/storage-class: "standard"
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      resources:
+#        requests:
+#          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emaildb
+  labels:
+    app: emaildb
+spec:
+  selector:
+    app: emaildb
+  ports:
+  - port: 27017
+    targetPort: 27017

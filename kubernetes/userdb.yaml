@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userdb
+  labels:
+    app: userdb
+spec:
+#  serviceName: userdb
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userdb
+  template:
+    metadata:
+      labels:
+        app: userdb
+#        replicaset: MainRepSet
+    spec:
+#      terminationGracePeriodSeconds: 10
+      containers:
+        - name: userdb-container
+          image: mongo:5.0.0
+          imagePullPolicy: IfNotPresent
+          command:
+#            - "mongod"
+#            - "--bind_ip"
+#            - "0.0.0.0"
+#            - "--replSet"
+#            - "MainRepSet"
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: userdb_client
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: hiddenpassword
+          ports:
+            - containerPort: 27017
+#          volumeMounts:
+#            - name: mongodb-persistent-storage-claim
+#              mountPath: /data/db
+#  volumeClaimTemplates:
+#  - metadata:
+#      name: mongodb-persistent-storage-claim
+#      annotations:
+#        volume.beta.kubernetes.io/storage-class: "standard"
+#    spec:
+#      accessModes: [ "ReadWriteOnce" ]
+#      resources:
+#        requests:
+#          storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: userdb
+  labels:
+    app: userdb
+spec:
+  selector:
+    app: userdb
+  ports:
+  - port: 27017
+    targetPort: 27017

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: antispam
+  labels:
+    app: antispam
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: antispam
+  template:
+    metadata:
+      labels:
+        app: antispam
+    spec:
+#      serviceAccountName: {{ include "chart.serviceAccountName" . }}
+#      securityContext:
+#        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: antispam
+#          securityContext:
+#            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: emailservice/antispam:0.1
+          imagePullPolicy: IfNotPresent
+          #command: ["python","-u","translator/main.py"]
+          #args:
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: antispam
+spec:
+  selector:
+    app: antispam
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
