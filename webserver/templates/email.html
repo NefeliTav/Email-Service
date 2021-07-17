@@ -158,8 +158,17 @@
         </a>
         <hr />
         <ul id="email-menu" class="nav nav-pills flex-column mb-auto">
+
+          
+          <li class="nav-item" id="sender">
+            <a href="#" class="nav-link active" aria-current="page" id="new_mail" style="background-color:blue;color:white;text-align:center;">
+              
+              New email
+            </a>
+          </li>
+          <br>
           <li class="nav-item" id="inbox">
-            <a href="#" class="nav-link active" aria-current="page" id="one">
+            <a href="#" class="nav-link" aria-current="page" id="inbox-btn">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -167,7 +176,7 @@
                 fill="currentColor"
                 class="bi bi-inbox-fill"
                 viewBox="0 0 16 16"
-              >
+              >/#
                 <path
                   d="M4.98 4a.5.5 0 0 0-.39.188L1.54 8H6a.5.5 0 0 1 .5.5 1.5 1.5 0 1 0 3 0A.5.5 0 0 1 10 8h4.46l-3.05-3.812A.5.5 0 0 0 11.02 4H4.98zm-1.17-.437A1.5 1.5 0 0 1 4.98 3h6.04a1.5 1.5 0 0 1 1.17.563l3.7 4.625a.5.5 0 0 1 .106.374l-.39 3.124A1.5 1.5 0 0 1 14.117 13H1.883a1.5 1.5 0 0 1-1.489-1.314l-.39-3.124a.5.5 0 0 1 .106-.374l3.7-4.625z"
                 />
@@ -177,7 +186,7 @@
             </a>
           </li>
           <li class="nav-item" id="spam">
-            <a href="#" class="nav-link" id="two">
+            <a href="#" class="nav-link" id="spam-btn">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -198,7 +207,7 @@
             </a>
           </li>
           <li class="nav-item" id="sent-mails">
-            <a href="#" class="nav-link" id="three">
+            <a href="#" class="nav-link" id="sent-btn">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
@@ -275,16 +284,16 @@
       <!--
       <div class="b-example-divider"></div>-->
 
-        <div id="inbox-list">
+        <div id="inbox-list" style="display:none;">
         <div
           class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white"
           style="width: 380px"
         >
           <div class="list-group list-group-flush border-bottom scrollarea">
             {% for i in mailbox %}
-
             <a
               href="#"
+              onclick="show_email('{{ i.sender }}','{{ i.receiver }}', '{{ i.text }}','{{ i.date }}','{{ i.time }}', '{{ i.subject }}' );return false;"
               class="list-group-item list-group-item-action active py-3 lh-tight"
               aria-current="true"
             >
@@ -300,7 +309,7 @@
           </div>
         </div>
       </div>
-        
+
       <div id="spam-list" style="display:none;">
 
         <div 
@@ -312,6 +321,7 @@
 
             <a
               href="#"
+              onclick="show_email('{{ i.sender }}','{{ i.receiver }}', '{{ i.text }}','{{ i.date }}','{{ i.time }}', '{{ i.subject }}' );return false;"
               class="list-group-item list-group-item-action active py-3 lh-tight"
               aria-current="true"
             >
@@ -321,7 +331,7 @@
                 <strong class="mb-1">{{i.subject}}</strong>
                 <small>{{i.date}}</small>
               </div>
-              <div class="col-10 mb-1 small">From: {{i.sender}}</div>
+              <div class="col-10 mb-1 small">From:list-gro {{i.sender}}</div>
             </a>
             {% endfor %}
           </div>
@@ -338,6 +348,7 @@
             {% for i in sent_emails %}
 
             <a
+              onclick="show_email('{{ i.sender }}', '{{ i.receiver }}', '{{ i.text }}','{{ i.date }}','{{ i.time }}', '{{ i.subject }}' );return false;"
               href="#"
               class="list-group-item list-group-item-action active py-3 lh-tight"
               aria-current="true"
@@ -359,7 +370,7 @@
 
 
       
-      <div>
+      <div id="send_form">
         <form action="" onsubmit="send(); return false;" style="padding-left: 50px;padding-top:50px;">
           {% csrf_token %}
       
@@ -392,8 +403,7 @@
                   .catch((e)=>console.error(e));
               }
           </script>
-
-          
+ 
           <label>To:</label><br>
           <input 
           style="border-radius: 30px;outline:none;padding-left:10px;"
@@ -403,31 +413,59 @@
           name="receiver"
           required/><br>
           <div id="receiver-error" class="error"></div>
-
+      
           <label>Subject:</label><br>
           <input 
           style="border-radius: 30px;outline:none;padding-left:10px;"
           type="text"
           id="subject"
           name="subject"/><br><br>
-
+      
           <label>Text:</label><br>
           <textarea style="width: 500px;height: 300px;border-radius: 30px;outline:none;padding-left:15px;"
           id="content"
           name="content"
           required></textarea><br>
-
+      
           <button type="submit" style="width:80px;height:40px;border-radius: 20px;background-color: #0D6EFD;color:white;padding: 0;
           border: none;margin-top:10px;">
               SEND
             </button>
           </form>
-
-
-
-
       </div>
+
+      <div class="see_email" id="see_email" style="padding-left:30px;padding-top:30px;"></div>
+
+      <script>
+        function show_email(sender,receiver,text,date,time,subject) {
+          //console.log(receiver,text,date,time,subject);
+          document.getElementById("send_form").style.display = "none";
+          document.getElementById("see_email").style.display = "block";
+
+          
+          var codeBlock = '';
+          codeBlock += '<p style="font-size:30px;">'+subject+'</p>'
+          codeBlock += '<p  style="font-size:11px;">'+date+', '+time+'</p>'
+          codeBlock += '<small>'+'From : '+sender+'</small><br>'
+          codeBlock += '<small>'+'To : '+receiver+'</small><hr>'
+          codeBlock += '<p>'+text+'</p>'
+          
+
+          $(".see_email").html(codeBlock);
+
+        }
+
+  
+      </script>
+
+
+
+      
+
+
     </main>
+
+
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
@@ -437,7 +475,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     <script>
-      $("#inbox,#drafts,#spam,#sent-mails").click(function () {
+      $("#sender,#inbox,#drafts,#spam,#sent-mails").click(function () {
         $("#email-menu")
           .children()
           .each(function () {
@@ -449,14 +487,25 @@
         let element = $(this.children);
         element.addClass("active");
 
-        var myElement = document.getElementById('one');
+        var myElement = document.getElementById('new_mail');
+        if(myElement === document.activeElement){
+          document.getElementById("sent-list").style.display = "none";
+          document.getElementById("spam-list").style.display = "none";
+          document.getElementById("inbox-list").style.display = "none";
+          document.getElementById("see_email").style.display = "none";
+          document.getElementById("send_form").style.display = "block";
+          
+
+        }
+
+        var myElement = document.getElementById('inbox-btn');
         if(myElement === document.activeElement){
           document.getElementById("sent-list").style.display = "none";
           document.getElementById("spam-list").style.display = "none";
           document.getElementById("inbox-list").style.display = "block";
         }
 
-        var myElement = document.getElementById('two');
+        var myElement = document.getElementById('spam-btn');
         if(myElement === document.activeElement){
           document.getElementById("spam-list").style.display = "block";
           document.getElementById("inbox-list").style.display = "none";
@@ -464,7 +513,7 @@
 
         }
 
-        var myElement = document.getElementById('three');
+        var myElement = document.getElementById('sent-btn');
         if(myElement === document.activeElement){
           document.getElementById("sent-list").style.display = "block";
           document.getElementById("spam-list").style.display = "none";
