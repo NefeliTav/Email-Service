@@ -1,4 +1,10 @@
 services:
+    nginx:
+        build: "nginx"
+        ports:
+            - "8001:80"
+        links:
+            - "webserver"
     webserver:
         build: "webserver"
         ports:
