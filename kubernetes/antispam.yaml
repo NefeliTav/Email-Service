@@ -14,17 +14,10 @@ spec:
       labels:
         app: antispam
     spec:
-#      serviceAccountName: {{ include "chart.serviceAccountName" . }}
-#      securityContext:
-#        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: antispam
-#          securityContext:
-#            {{- toYaml .Values.securityContext | nindent 12 }}
           image: emailservice/antispam:0.1
           imagePullPolicy: IfNotPresent
-          #command: ["python","-u","translator/main.py"]
-          #args:
 ---
 apiVersion: v1
 kind: Service

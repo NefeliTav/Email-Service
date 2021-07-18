@@ -14,26 +14,28 @@ spec:
       labels:
         app: webserver
     spec:
-#      serviceAccountName: {{ include "chart.serviceAccountName" . }}
-#      securityContext:
-#        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: webserver
-#          securityContext:
-#            {{- toYaml .Values.securityContext | nindent 12 }}
           image: emailservice/webserver:0.1
           imagePullPolicy: IfNotPresent
-          #command: ["python","-u","translator/main.py"]
-          #args:
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 0.25Gi
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: webserver
 spec:
+  type: NodePort
   selector:
     app: webserver
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8000
+      nodePort: 30001
