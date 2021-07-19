@@ -1,14 +1,14 @@
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: webserver
+  name: antisapm
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: webserver
+    name: antispam
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 5
   metrics:
   - type: Resource
     resource:

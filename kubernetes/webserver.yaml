@@ -5,7 +5,7 @@ metadata:
   labels:
     app: webserver
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: webserver
@@ -20,11 +20,11 @@ spec:
           imagePullPolicy: IfNotPresent
           resources:
             limits:
-              cpu: 500m
+              cpu: 1500m
               memory: 1Gi
             requests:
-              cpu: 200m
-              memory: 0.25Gi
+              cpu: 500m
+              memory: 0.5Gi
 ---
 apiVersion: v1
 kind: Service
