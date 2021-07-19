@@ -53,18 +53,15 @@ def login(request):
         # authenticate
         errors = {}
         try:
-            account = accountutils.get_account(email=email+'@email.com')
-            if not check_password(password, account.password):
-                errors["password"] = "Wrong password"
+            encoded_token = accountutils.autenticate(email=email+'@email.com', password=password)
+            if encoded_token is None:
+                errors["password"] = "Wrong credentials"
         except:
-            errors["email"] = "This email address doesn't exist"
+            errors["email"] = "Error while autenticating user!"
 
         # return error messages
         if errors != {}:
             return JsonResponse({'errors': errors})
-
-        encoded_token = jwt.encode(
-            {'id': account.user_id}, 'SECRET', algorithm='HS256')
 
         print("Login successful")
         # start session
@@ -130,7 +127,7 @@ def signup(request):
                                                   last_name=last_name,
                                                   email=email+'@email.com',
                                                   date_of_birth=date_of_birth,
-                                                  password=make_password(password))  # hash password
+                                                  password=password)  # hash password
             # user is in db
             print('User Created')
 
@@ -191,7 +188,7 @@ def profile(request):
             try:
                 # update password
                 accountutils.update_password(user_id=user_id,
-                                             password=make_password(password))
+                                             password=password)
             except:
                 # if any problem occurs, try again
                 return render(request, "accounts/profile.html", {"token": encoded_token})

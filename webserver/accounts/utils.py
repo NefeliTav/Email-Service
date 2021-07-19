@@ -1,57 +1,70 @@
 from bson import ObjectId
 from django.conf import settings
 from .models import Account
-from pymongo import MongoClient
+import requests
+
 
 def get_account(user_id=None, email=None):
-    client = MongoClient(settings.USERDB_HOST,
-                         username=settings.USERDB_USERNAME,
-                         password=settings.USERDB_PASSWORD)
 
-    userdb = client['userdb']
+    request = { 'user_id' : user_id, 'email' : email }
+    response = requests.post(f'{settings.USERS_URL}/getaccount', json=request)
+    json = response.json()
 
-    rule = {}
-    if user_id is not None:
-        rule['_id'] = ObjectId(user_id)
-    if email is not None:
-        rule['email'] = email
+    if json['status'] == 'Fail':
+        raise Exception('Password update failed!')
 
-    response = userdb.mycoll.find(rule)
-    user = response[0]
+    return Account(user_id=json['user_id'],
+                   first_name=json['first_name'],
+                   last_name=json['last_name'],
+                   email=json['email'],
+                   date_of_birth=json['date_of_birth'],
+                   password=json['password'])
 
-    return Account(user_id=str(user['_id']),
-                   first_name=user['first_name'],
-                   last_name=user['last_name'],
-                   email=user['email'],
-                   date_of_birth=user['date_of_birth'],
-                   password=user['password'])
 
 def create_account(first_name=None, last_name=None, email=None,
         date_of_birth=None, password=None):
-    client = MongoClient(settings.USERDB_HOST,
-                         username=settings.USERDB_USERNAME,
-                         password=settings.USERDB_PASSWORD)
 
-    userdb = client['userdb']
-    user_id = userdb.mycoll.insert_one({'first_name' : first_name,
-                                        'last_name' : last_name,
-                                        'email' : email,
-                                        'date_of_birth' : date_of_birth,
-                                        'password' : password
-                                        }).inserted_id
+    request = { 'first_name' : first_name,
+                'last_name' : last_name,
+                'email' : email,
+                'date_of_birth' : date_of_birth,
+                'password' : password,
+                }
 
-    return Account(user_id=id,
-                   first_name=first_name,
-                   last_name=last_name,
-                   email=email,
-                   date_of_birth=date_of_birth,
-                   password=password)
+    response = requests.post(f'{settings.USERS_URL}/createaccount', json=request)
+    json = response.json()
+
+    if json['status'] == 'Fail':
+        raise Exception('Create account failed')
+
+    return Account(user_id=json['user_id'],
+                   first_name=json['first_name'],
+                   last_name=json['last_name'],
+                   email=json['email'],
+                   date_of_birth=json['date_of_birth'],
+                   password=json['password'])
+
 
 def update_password(user_id=None, password=None):
-    client = MongoClient(settings.USERDB_HOST,
-                         username=settings.USERDB_USERNAME,
-                         password=settings.USERDB_PASSWORD)
+    request = { 'user_id' : user_id, 'password' : password }
+    response = requests.post(f'{settings.USERS_URL}/signup', json=request)
+    json = response.json()
 
-    userdb = client['userdb']
-    userdb.mycoll.update_one({'_id' : ObjectId(user_id)},
-                            {'$set' : {'password' : password}})
+    if json['status'] == 'Fail':
+        raise Exception('Password update failed!')
+
+
+def autenticate(email=None, password=None):
+    request = { 'email' : email, 'password' : password }
+
+    response = requests.post(f'{settings.USERS_URL}/autenticate', json=request)
+    print(response)
+    json = response.json()
+
+    if json['status'] == 'Fail':
+        raise Exception('Autenticating failed!')
+
+    if json['status'] == 'Wrong':
+        return None
+
+    return json['token']

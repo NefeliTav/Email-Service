@@ -134,6 +134,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 ANTISPAM_CHECK_URL = 'http://antispam:5000'
+USERS_URL = 'http://users:5000'
 
 EMAILDB_HOST = "emaildb:27017"
 EMAILDB_USERNAME = 'emaildb_client'
