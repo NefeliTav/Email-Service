@@ -1,52 +1,40 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: userdb
-  labels:
-    app: userdb
 spec:
-#  serviceName: userdb
-  replicas: 1
   selector:
     matchLabels:
       app: userdb
+  serviceName: "userdb"
+  replicas: 3
   template:
     metadata:
       labels:
         app: userdb
-#        replicaset: MainRepSet
     spec:
-#      terminationGracePeriodSeconds: 10
+      terminationGracePeriodSeconds: 10
       containers:
-        - name: userdb-container
-          image: mongo:5.0.0
-          imagePullPolicy: IfNotPresent
-          command:
-#            - "mongod"
-#            - "--bind_ip"
-#            - "0.0.0.0"
-#            - "--replSet"
-#            - "MainRepSet"
-          env:
-            - name: MONGO_INITDB_ROOT_USERNAME
-              value: userdb_client
-            - name: MONGO_INITDB_ROOT_PASSWORD
-              value: hiddenpassword
-          ports:
-            - containerPort: 27017
-#          volumeMounts:
-#            - name: mongodb-persistent-storage-claim
-#              mountPath: /data/db
-#  volumeClaimTemplates:
-#  - metadata:
-#      name: mongodb-persistent-storage-claim
-#      annotations:
-#        volume.beta.kubernetes.io/storage-class: "standard"
-#    spec:
-#      accessModes: [ "ReadWriteOnce" ]
-#      resources:
-#        requests:
-#          storage: 1Gi
+      - name: mongo
+        image: mongo:5.0.0
+        command:
+        - mongod
+        - "--bind_ip_all"
+        - "--replSet"
+        - rs0
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+        - name: userdb-volume
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: userdb-volume
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 0.5Gi
 ---
 apiVersion: v1
 kind: Service
@@ -55,8 +43,10 @@ metadata:
   labels:
     app: userdb
 spec:
+  ports:
+  - name: userdb
+    port: 27017
+    targetPort: 27017
+  clusterIP: None
   selector:
     app: userdb
-  ports:
-  - port: 27017
-    targetPort: 27017

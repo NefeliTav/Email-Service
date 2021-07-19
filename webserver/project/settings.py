@@ -140,6 +140,7 @@ EMAILDB_HOST = "emaildb:27017"
 EMAILDB_USERNAME = 'emaildb_client'
 EMAILDB_PASSWORD = 'hiddenpassword'
 
-USERDB_HOST = "userdb:27017"
+#USERDB_HOST = "userdb:27017"
+USERDB_HOST = "mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017"
 USERDB_USERNAME = 'userdb_client'
 USERDB_PASSWORD = 'hiddenpassword'
