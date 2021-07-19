@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: antispam
-          image: emailservice/antispam:0.1
+          image: emailservice/antispam:0.2
           imagePullPolicy: IfNotPresent
           resources:
             limits:

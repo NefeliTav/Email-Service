@@ -136,11 +136,12 @@ CORS_ALLOW_CREDENTIALS = True
 ANTISPAM_CHECK_URL = 'http://antispam:5000'
 USERS_URL = 'http://users:5000'
 
-EMAILDB_HOST = "emaildb:27017"
-EMAILDB_USERNAME = 'emaildb_client'
-EMAILDB_PASSWORD = 'hiddenpassword'
+#EMAILDB_HOST = "emaildb:27017"
+EMAILDB_HOST = "emaildb-0.emaildb,emaildb-1.emaildb,emaildb-2.emaildb:27017"
+# EMAILDB_USERNAME = 'emaildb_client'
+# EMAILDB_PASSWORD = 'hiddenpassword'
 
 #USERDB_HOST = "userdb:27017"
-USERDB_HOST = "mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017"
-USERDB_USERNAME = 'userdb_client'
-USERDB_PASSWORD = 'hiddenpassword'
+USERDB_HOST = "userdb-0.userdb,userdb-1.userdb,userdb-2.userdb:27017"
+# USERDB_USERNAME = 'userdb_client'
+# USERDB_PASSWORD = 'hiddenpassword'

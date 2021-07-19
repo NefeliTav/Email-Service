@@ -4,17 +4,19 @@ import json
 import time
 import random
 
-RECEIVER = "xaxa@email.com"
-PASSWORD = "Abba1234"
+RECEIVER = "ww@email.com"
+PASSWORD = "F331l0f0s@"
 
 class WebsiteUser(HttpUser):
     wait_time = between(1, 2)
 
     def on_start(self):
-        #self.login()
-        self.signup()
+        self.login()
+        #self.signup()
 
     def signup(self):
+        # response = self.client.get('/auth/login/')
+        # csrftoken = response.cookies['csrftoken']
         email = str(time.time() * 1000) + str(random.randint(0, 1000000000))
 
         req = {"first_name" : "Vladimir",
@@ -31,7 +33,7 @@ class WebsiteUser(HttpUser):
         response = self.client.get('/auth/login/')
         csrftoken = response.cookies['csrftoken']
 
-        req = {"email"    : "xaxa",
+        req = {"email"    : "zz",
                "password" : PASSWORD}
         req = json.dumps(req)
 

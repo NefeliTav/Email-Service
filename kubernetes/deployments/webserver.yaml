@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: webserver
-          image: emailservice/webserver:0.1
+          image: emailservice/webserver:0.4
           imagePullPolicy: IfNotPresent
           resources:
             limits:
@@ -31,11 +31,11 @@ kind: Service
 metadata:
   name: webserver
 spec:
-  type: NodePort
+#  type: NodePort
   selector:
     app: webserver
   ports:
     - protocol: TCP
-      port: 80
+      port: 8000
       targetPort: 8000
-      nodePort: 30001
+#      nodePort: 30001

@@ -12,9 +12,7 @@ def is_spam(subject=None, content=None):
     return json['is_spam']
 
 def save_email(sender=None, receiver=None, content=None, subject=None, is_spam=None):
-    client = MongoClient(settings.EMAILDB_HOST,
-                         username=settings.EMAILDB_USERNAME,
-                         password=settings.EMAILDB_PASSWORD)
+    client = MongoClient(settings.USERDB_HOST)
 
     emaildb = client['emaildb']
     emaildb.mycoll.insert_one({'sender' : sender,
@@ -25,9 +23,7 @@ def save_email(sender=None, receiver=None, content=None, subject=None, is_spam=N
                                })
 
 def get_emails(sender=None, receiver=None, is_spam=None):
-    client = MongoClient(settings.EMAILDB_HOST,
-                         username=settings.EMAILDB_USERNAME,
-                         password=settings.EMAILDB_PASSWORD)
+    client = MongoClient(settings.USERDB_HOST)
 
     emaildb = client['emaildb']
 
