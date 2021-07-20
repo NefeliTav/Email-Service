@@ -8,13 +8,16 @@ RECEIVER = "xaxa@email.com"
 PASSWORD = "Abba1234"
 
 class WebsiteUser(HttpUser):
-    wait_time = between(1, 2)
+    wait_time = between(1, 3)
 
     def on_start(self):
         #self.login()
         self.signup()
 
     def signup(self):
+        response = self.client.get('/auth/login/')
+        csrftoken = response.cookies['csrftoken']
+
         email = str(time.time() * 1000) + str(random.randint(0, 1000000000))
 
         req = {"first_name" : "Vladimir",
